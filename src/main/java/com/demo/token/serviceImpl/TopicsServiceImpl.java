@@ -185,18 +185,18 @@ public class TopicsServiceImpl implements TopicsService {
 	            } else {
 	                // Create a new read status
 	                TopicsReadStatus readStatus = new TopicsReadStatus();
-	                readStatus.setTopics_uuid(topicsUuid); // Set the topic UUID
+	                readStatus.setTopicsUuid(topicsUuid); // Set the topic UUID
 	                readStatus.setTopics(topic); // Set the topic entity
-	                readStatus.setUsers_uuid(users.getUuid()); // Set the user UUID
+	                readStatus.setUsersUuid(users.getUuid()); // Set the user UUID
 	                readStatus.setUserName(users.getUserName()); // Set the username
 	                readStatus.setRole(users.getRole()); // Set the user role
 	                readStatus.setReadAt(LocalDateTime.now()); // Set the current timestamp
-
+	                readStatus.setUsers(users);
+	                readStatus.setVersion(readStatus.getVersion()+1);
 	                topicsReadStatusService.saveStatus(readStatus); // Save the new read status
 	            }
 	        }
 
-	        // Return the description if present
 	        return description;
 	    }
 	    // Return an empty Optional if no description was found

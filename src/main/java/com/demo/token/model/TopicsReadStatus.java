@@ -54,6 +54,7 @@ public class TopicsReadStatus {
 	/**
 	 * user name to, who reads the topics
 	 */
+	@JoinColumn(name = "user_name")
 	private String userName;
 
 	/**
@@ -65,16 +66,22 @@ public class TopicsReadStatus {
 	/**
 	 * To identify the time of read
 	 */
+	@JoinColumn(name = "read_at")
 	private LocalDateTime readAt;
 
 	/**
 	 * To identify the topics easily by its uuid
 	 */
-	private String topics_uuid;
+	@JoinColumn(name = "topics_uuid")
+	private String topicsUuid;
 
 	/**
 	 * To identify the User easily by user's uuid
 	 */
-	private String users_uuid;
+	@JoinColumn(name = "users_uuid")
+	private String usersUuid;
+	
+	@Version
+	private int version;
 
 }

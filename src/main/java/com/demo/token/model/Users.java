@@ -56,6 +56,7 @@ public class Users {
 	/**
 	 * unique phoneNumber for each user
 	 */
+	@Column(name="phone_number",nullable = false)
 	private String phoneNumber;
 
 	/**
