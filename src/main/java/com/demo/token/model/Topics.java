@@ -75,25 +75,28 @@ public class Topics {
 	 * To identify the time of creation
 	 */
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name="created_at",nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	/**
 	 * To identify the time of updatedAt
 	 */
 	@LastModifiedDate
+	@Column(name="updated_at",nullable = false)
 	private LocalDateTime updatedAt;
 
 	/**
 	 * To identify the ,who created the topics
 	 */
 	@CreatedBy
+	@Column(name="created_by",nullable = false)
 	private String createdBy;
 
 	/**
 	 * To identify,who updates the topics entity
 	 */
 	@LastModifiedBy
+	@Column(name="updated_by",nullable = false)
 	private String updatedBy;
 
 	/**
@@ -107,7 +110,7 @@ public class Topics {
 	 * Used to represent a user is active or not
 	 */
 
-	@Column(nullable = false)
+	@Column(name="is_active",nullable = false)
 	private boolean isActive;
 
 }

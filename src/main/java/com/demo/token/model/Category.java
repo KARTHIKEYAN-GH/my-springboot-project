@@ -37,7 +37,7 @@ public class Category {
 	/**
 	 * It is an auto generated value for each Topic
 	 * This is  Category Model
-	 * Updated codeee fdhdhsghz xyz
+	 * 
 	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,19 +71,21 @@ public class Category {
 	 * To identify the ,who updates the category(ADMIN or TRAINEE)
 	 */
 	@LastModifiedBy
+	@Column(name = "updated_by")
 	private String updatedBy;
 
 	/**
 	 * To identify the time of creation
 	 */
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name="created_at",nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	/**
 	 * To identify the time of updates made on category
 	 */
 	@LastModifiedDate
+	@Column(name="updated_at",nullable = false)
 	private LocalDateTime updatedAt;
 	
 	/**
@@ -94,7 +96,7 @@ public class Category {
 	private Long version;
 	
 	
-	@Column(nullable = false)
+	@Column(name="is_active",nullable = false)
 	private boolean isActive;
 	
 	

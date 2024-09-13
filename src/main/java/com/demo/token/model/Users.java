@@ -61,6 +61,7 @@ public class Users {
 	/**
 	 * Unique userName for login
 	 */
+	@Column(name="user_name",nullable = false)
 	private String userName;
 
 	/**
@@ -71,6 +72,7 @@ public class Users {
 	/**
 	 * Used to represent a user is active or not
 	 */
+	@Column(name="is_active",nullable = false)
 	private Boolean isActive;
 
 	/**
@@ -100,13 +102,14 @@ public class Users {
 	 * To identify the time of Creation
 	 */
 	@CreatedDate
-	@Column(nullable = false, updatable = false)
+	@Column(name="created_at",nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	/**
 	 * To identify the time of updatedAt
 	 */
 	@LastModifiedDate
+	@Column(name="updated_at",nullable = false)
 	private LocalDateTime updatedAt;
 
 }
