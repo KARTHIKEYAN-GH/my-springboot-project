@@ -88,7 +88,7 @@ public class UserServiceImpl implements UsersService {
 		// }
 		Optional<Users> existingUser = userRepository.findByuserNameAndIsActive(users.getUserName(), true);
 		if (existingUser.isPresent()) {
-			throw new IllegalStateException("A user with this username already exists and is active.");
+			throw new IllegalStateException("A user with this userName already exists and is active.");
 		}
 
 		Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(users.getPhoneNumber(), true);
@@ -144,6 +144,11 @@ public class UserServiceImpl implements UsersService {
 	    if (existingPhone.isPresent() && !existingPhone.get().getUuid().equals(uuid)) {
 	        throw new IllegalArgumentException("Phone number is already in use by another account.");
 	    }
+	    Optional<Users> existingUserName=userRepository.findByUserName(users.getUserName());
+	    if(existingUserName.isPresent()&& !existingUserName.get().getUuid().equals(uuid))
+	    {
+	    	throw new IllegalArgumentException("A user with this userName already exist");
+	    }
 		Users user = userRepository.findByUuid(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
 		user.setName(users.getName());
@@ -160,11 +165,11 @@ public class UserServiceImpl implements UsersService {
 	}
 	@Override
 	public Optional<String> deactiveUser(String Uuid) {
-		Users deletedUser = userRepository.findByUuid(Uuid).orElseThrow(() -> new RuntimeException("user not found"));
+		Users deletedUser = userRepository.findByUuid(Uuid).orElseThrow(() -> new IllegalArgumentException(" user not found with uuid"));
 		if (deletedUser.getRole().equals(Role.ADMIN)) {
 			throw new IllegalStateException("Yor are trying to delete a Admin !!!!.");
 		}
-
+		
 		deletedUser.setIsActive(false);
 		userRepository.save(deletedUser);
 		return Optional.of(deletedUser.getName());

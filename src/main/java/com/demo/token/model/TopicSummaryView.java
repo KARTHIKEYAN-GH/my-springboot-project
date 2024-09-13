@@ -18,15 +18,13 @@ import lombok.Setter;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 public class TopicSummaryView {
 
 	/**
 	 * It is an auto generated value for each view
 	 */
 	@Id
-	@Column(name = "id") // Ensure this matches the primary key column of the view
+	@Column(name = "id") 
 	private Long id;
 
 	/**
@@ -39,7 +37,7 @@ public class TopicSummaryView {
 	 * This field represents time of creation of topics
 	 */
 	@Column(name = "created_at")
-	private String createdAt; // Adjust the type according to your database column type
+	private String createdAt; // 
 
 	/**
 	 * To identify the topic's category

@@ -27,8 +27,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Getter
-@Setter
 public class TopicsReadStatus {
 	/**
 	 * It is an auto generated value for each user
@@ -81,6 +79,9 @@ public class TopicsReadStatus {
 	@JoinColumn(name = "users_uuid")
 	private String usersUuid;
 	
+	/**
+	 * To identify the count of reads By ATTENDEE only
+	 */
 	@Version
 	private int version;
 

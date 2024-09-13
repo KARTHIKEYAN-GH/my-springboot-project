@@ -1,6 +1,7 @@
 package com.demo.token.controller;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -125,11 +126,14 @@ public class AuthController {
 				return ResponseEntity.ok("User not found or Faild to deltte");
 			}
 		} catch (IllegalStateException e) {
-			// Handle specific exception when trying to deactivate an admin
-			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		} catch (Exception e) {
-			// Handle other unexpected exceptions
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + e.getMessage());
+		    // Handle specific exception when trying to deactivate an admin
+		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (NoSuchElementException | IllegalArgumentException e) {
+		    // Handle UUID not found or wrong UUID format scenarios
+		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid or non-existent UUID"+ e.getMessage());
+		} catch (Exception ex) {
+		    // Handle other unexpected exceptions
+		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
 		}
 	}
 

@@ -31,8 +31,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @EntityListeners(AuditingEntityListener.class)
-@Getter
-@Setter
 public class Category {
 	/**
 	 * It is an auto generated value for each Topic

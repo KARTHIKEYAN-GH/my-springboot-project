@@ -3,7 +3,9 @@ package com.demo.token.model;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -27,8 +29,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@Getter
-@Setter
 public class Users {
 	/**
 	 * It is an auto generated value for each user
@@ -77,7 +77,6 @@ public class Users {
 	private Boolean isActive;
 
 	/**
-	 *
 	 * To identify the count of updated made on Users
 	 */
 	@Version
@@ -112,5 +111,19 @@ public class Users {
 	@LastModifiedDate
 	@Column(name="updated_at",nullable = false)
 	private LocalDateTime updatedAt;
-
+	
+	/**
+	 * To identify the ,who created the category
+	 */
+	@CreatedBy
+	@Column(name = "created_by")
+	private String createdBY;
+	
+	/**
+	 * To identify the ,who updates the category(ADMIN or TRAINEE)
+	 */
+	@LastModifiedBy
+	@Column(name = "updated_by")
+	private String updatedBy;
+	
 }
