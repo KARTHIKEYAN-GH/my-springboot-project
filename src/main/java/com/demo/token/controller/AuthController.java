@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.token.dto.AuthenticationResponse;
 import com.demo.token.dto.UsersDTO;
+import com.demo.token.exception.NoUsersFoundException;
 import com.demo.token.model.Users;
 import com.demo.token.service.UsersService;
 
@@ -59,9 +60,10 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-		}
+		} 
+		//catch (Exception e) {
+//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+//		}
 	}
 
 	/**
@@ -144,13 +146,23 @@ public class AuthController {
 	 */
 	@GetMapping("/getAllUsers")
 	public ResponseEntity<?> getAllUsers() {
+		try {
 		List<UsersDTO> allUsers = userService.getAllUsers();
-		if (allUsers.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Users found");
+		if(allUsers.isEmpty())
+		{
+			throw new NoUsersFoundException("No User Found");
 		}
-		return ResponseEntity.ok(allUsers);
+		else
+		{
+			return ResponseEntity.ok(allUsers);
+		}
+		}
+		catch(Exception e)
+		{
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+		
 	}
-
 	/**
 	 * To get all Active Users
 	 * 

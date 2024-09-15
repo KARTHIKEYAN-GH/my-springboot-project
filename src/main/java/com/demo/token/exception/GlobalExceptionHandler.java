@@ -31,6 +31,16 @@ public class GlobalExceptionHandler {
     {
     	return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(NoUsersFoundException.class)
+    public ResponseEntity<String> handleNoUsersFoundException(NoUsersFoundException ex)
+    {
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String>handleIllegalArgumentException(IllegalArgumentException ex)
+    {
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex) {
         return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);

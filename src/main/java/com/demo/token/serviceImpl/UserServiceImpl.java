@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.AuthenticationResponse;
 import com.demo.token.dto.UsersDTO;
+import com.demo.token.exception.NoUsersFoundException;
 import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.model.Users;
 import com.demo.token.model.Users.Role;
@@ -97,13 +98,20 @@ public class UserServiceImpl implements UsersService {
 		}
 
 		// Check if an ADMIN already exists; only one ADMIN is allowed
-		if (users.getRole().equals(Role.ADMIN)) {
-			Optional<Users> existingAdmin = userRepository.findByRole(Role.ADMIN);
-			if (existingAdmin.isPresent()) {
-				throw new IllegalStateException(
-						"Only one ADMIN is allowed. The existing ADMIN can create users with roles TRAINEE or ATTENDEE.");
-			}
-		}
+//		if (users.getRole().equals(Role.ADMIN)) {
+//			Optional<Users> existingAdmin = userRepository.findByRole(Role.ADMIN);
+//			if (existingAdmin.isPresent()) {
+//				throw new IllegalStateException(
+//						"Only one ADMIN is allowed. The existing ADMIN can create users with roles TRAINEE or ATTENDEE.");
+//			}
+			
+//		if(users.getRole().equals(Role.ADMIN))
+//		{
+//			throw new IllegalStateException("Please check your role(TRAINEE or ATTENDEE)");
+//		
+//		}
+		if(users.getRole().equals(Role.TRAINEE)||users.getRole().equals(Role.ATTENDEE))
+		{
 		mailService.sendEmail(users.getEmail(), users.getName(), users.getEmail(), users.getPhoneNumber(),
 				users.getUserName(), users.getPassword(), users.getRole());
 		users.setIsActive(true);
@@ -111,12 +119,18 @@ public class UserServiceImpl implements UsersService {
 
 		Users savedUsers = userRepository.save(users);
 		return convertToDTO(savedUsers);
+		}
+		else
+		{
+			throw new IllegalArgumentException("Please check your role(TRAINEE or ATTENDEE)");
+
+		}
 	}
 	@Override
 	public AuthenticationResponse authenticate(Users request) {
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
-		Users users = userRepository.findByuserName(request.getUserName()).orElseThrow();
+		Users users = userRepository.findByuserName(request.getUserName()).orElseThrow(()-> new NoUsersFoundException("No user found given user name"));
 		if (users.getIsActive()) {
 			String token = jwtService.generateToken(users);
 			return new AuthenticationResponse(token);
@@ -169,14 +183,18 @@ public class UserServiceImpl implements UsersService {
 		if (deletedUser.getRole().equals(Role.ADMIN)) {
 			throw new IllegalStateException("Yor are trying to delete a Admin !!!!.");
 		}
-		
 		deletedUser.setIsActive(false);
 		userRepository.save(deletedUser);
 		return Optional.of(deletedUser.getName());
 	}
 	@Override
 	public List<UsersDTO> getAllUsers() {
-		return userRepository.findAll().stream()// Convert list to Stream
+		List<Users> users=userRepository.findAll();
+		if(users.isEmpty() || users.stream().allMatch(user -> user.getRole().equals(Role.ADMIN))) 
+		{
+			throw new ResourceNotFoundException("No User Founds");
+		}
+		return users.stream()// Convert list to Stream 
 				.map(this::convertToDTO) // Convert each Users to UsersDTO
 				.collect(Collectors.toList());// Collect results into a List<UsersDTO>
 	}
@@ -211,8 +229,6 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	public List<UsersDTO> findAllByNameContaining(String name) {
-	
 		return userRepository.findByNameContaining(name).stream().map(this::convertToDTO).collect(Collectors.toList());
-
 	}
 }
