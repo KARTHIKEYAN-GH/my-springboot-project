@@ -21,7 +21,6 @@ import com.demo.token.dto.TopicsDTO;
 import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.model.Topics;
 import com.demo.token.service.TopicsService;
-import com.demo.token.serviceImpl.TopicsServiceImpl;
 
 @RestController
 @RequestMapping("/api/topics")

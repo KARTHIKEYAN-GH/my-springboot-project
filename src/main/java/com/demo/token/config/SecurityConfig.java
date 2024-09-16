@@ -34,13 +34,13 @@ public class SecurityConfig {
                 req	
                 	.requestMatchers("/api/user/login").permitAll()
                 	
-                    .requestMatchers("/api/user/**","/api/topic-view").hasAuthority("ADMIN")
+                    .requestMatchers("/api/user/**","/api/topic-view/**").hasAuthority("ADMIN")
                     
                     .requestMatchers("/api/categories/getAllCategories","/api/categories/getById/{Uuid}","/api/topics/getAllTopics","/api/topics/getById/{Uuid}","/api/topics/viewDescription/{Uuid}").hasAnyAuthority("ADMIN","TRAINEE","ATTENDEE")
                     
-                    .requestMatchers("/api/categories/**").hasAnyAuthority("ADMIN","TRAINEE")
+                    .requestMatchers("/api/categories/**","/api/topic-view/**").hasAnyAuthority("ADMIN","TRAINEE")
 
-                    .requestMatchers("/api/topics/**").hasAnyAuthority("ADMIN","TRAINEE")
+                    .requestMatchers("/api/topics/**","/api/topic-view/**").hasAnyAuthority("ADMIN","TRAINEE")
                     
                     .anyRequest().authenticated()
             ).userDetailsService(userDetailsSeviceImpl)

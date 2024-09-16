@@ -106,11 +106,10 @@ public class TopicsServiceImpl implements TopicsService {
 //		}
 //		return Extopics;
 //	}
-	
+
 	@Override
 	public List<TopicsDTO> getAllTopics() {
-		List<TopicsDTO> Extopics = topicsRepository.findByIsActiveTrue().stream()
-				.map(this::convertsToDTO)
+		List<TopicsDTO> Extopics = topicsRepository.findByIsActiveTrue().stream().map(this::convertsToDTO)
 				.collect(Collectors.toList());
 		if (Extopics.isEmpty()) {
 			throw new IllegalArgumentException("Topcs not found ");
@@ -155,52 +154,54 @@ public class TopicsServiceImpl implements TopicsService {
 
 	@Override
 	public Optional<DescriptionDTO> findAndMarkDescriptionAsReadByTopicsUuid(String topicsUuid, String token) {
-	    // Fetch the description for the given topics UUID and convert it to a DescriptionDTO
-	    Optional<DescriptionDTO> description = topicsRepository.findDescriptionByTopicsUuid(topicsUuid).stream()
-	            .map(this::convertsDescriptionToDTO) // Convert each description to DescriptionDTO
-	            .findFirst(); // Get the first description, if present
+		// Fetch the description for the given topics UUID and convert it to a
+		// DescriptionDTO
+		Optional<DescriptionDTO> description = topicsRepository.findDescriptionByTopicsUuid(topicsUuid).stream()
+				.map(this::convertsDescriptionToDTO) // Convert each description to DescriptionDTO
+				.findFirst(); // Get the first description, if present
 
-	    if (description.isPresent()) {
-	        // Extract the username from the JWT token
-	        String username = jwtservice.extractUserName(token);
+		if (description.isPresent()) {
+			// Extract the username from the JWT token
+			String username = jwtservice.extractUserName(token);
 
-	        // Find the user by username, throw an exception if not found
-	        Users users = usersService.findByUserName(username)
-	                .orElseThrow(() -> new UsernameNotFoundException("Username not found"));
+			// Find the user by username, throw an exception if not found
+			Users users = usersService.findByUserName(username)
+					.orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
-	        // Find the topic by UUID, throw an exception if not found
-	        Topics topic = topicsRepository.findByUuid(topicsUuid)
-	                .orElseThrow(() -> new TopicNotFoundException("Topic not found"));
+			// Find the topic by UUID, throw an exception if not found
+			Topics topic = topicsRepository.findByUuid(topicsUuid)
+					.orElseThrow(() -> new TopicNotFoundException("Topic not found"));
 
-	        // Check if the role of the user is ATTENDEE
-	        if (users.getRole().equals(Role.ATTENDEE)) {
-	            // Check if there's an existing read status for this user and topic
-	            Optional<TopicsReadStatus> existingReadStatus = topicsReadStatusService.getReadStatusByTopicsUuidAndUserUuid(topicsUuid, users.getUuid());
+			// Check if the role of the user is ATTENDEE
+			if (users.getRole().equals(Role.ATTENDEE)) {
+				// Check if there's an existing read status for this user and topic
+				Optional<TopicsReadStatus> existingReadStatus = topicsReadStatusService
+						.getReadStatusByTopicsUuidAndUserUuid(topicsUuid, users.getUuid());
 
-	            if (existingReadStatus.isPresent()) {
-	                // Update the existing read status with the new read time
-	                TopicsReadStatus readStatus = existingReadStatus.get();
-	                readStatus.setReadAt(LocalDateTime.now());
-	                topicsReadStatusService.saveStatus(readStatus); // Save the updated read status
-	            } else {
-	                // Create a new read status
-	                TopicsReadStatus readStatus = new TopicsReadStatus();
-	                readStatus.setTopicsUuid(topicsUuid); // Set the topic UUID
-	                readStatus.setTopics(topic); // Set the topic entity
-	                readStatus.setUsersUuid(users.getUuid()); // Set the user UUID
-	                readStatus.setUserName(users.getUserName()); // Set the username
-	                readStatus.setRole(users.getRole()); // Set the user role
-	                readStatus.setReadAt(LocalDateTime.now()); // Set the current timestamp
-	                readStatus.setUsers(users);
-	                readStatus.setVersion(readStatus.getVersion()+1);
-	                topicsReadStatusService.saveStatus(readStatus); // Save the new read status
-	            }
-	        }
+				if (existingReadStatus.isPresent()) {
+					// Update the existing read status with the new read time
+					TopicsReadStatus readStatus = existingReadStatus.get();
+					readStatus.setReadAt(LocalDateTime.now());
+					topicsReadStatusService.saveStatus(readStatus); // Save the updated read status
+				} else {
+					// Create a new read status
+					TopicsReadStatus readStatus = new TopicsReadStatus();
+					readStatus.setTopicsUuid(topicsUuid); // Set the topic UUID
+					readStatus.setTopics(topic); // Set the topic entity
+					readStatus.setUsersUuid(users.getUuid()); // Set the user UUID
+					readStatus.setUserName(users.getUserName()); // Set the username
+					readStatus.setRole(users.getRole()); // Set the user role
+					readStatus.setReadAt(LocalDateTime.now()); // Set the current timestamp
+					readStatus.setUsers(users);
+					readStatus.setVersion(readStatus.getVersion() + 1);
+					topicsReadStatusService.saveStatus(readStatus); // Save the new read status
+				}
+			}
 
-	        return description;
-	    }
-	    // Return an empty Optional if no description was found
-	    return Optional.empty();
+			return description;
+		}
+		// Return an empty Optional if no description was found
+		return Optional.empty();
 	}
 
 	@Override

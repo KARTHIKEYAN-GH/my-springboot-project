@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import com.demo.token.dto.AuthenticationResponse;
 import com.demo.token.dto.UsersDTO;
-import com.demo.token.model.Category;
 import com.demo.token.model.Users;
 
 public interface UsersService {

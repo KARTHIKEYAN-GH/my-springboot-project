@@ -5,12 +5,12 @@ import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.AuthenticationResponse;
 import com.demo.token.dto.UsersDTO;
-import com.demo.token.exception.NoUsersFoundException;
 import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.model.Users;
 import com.demo.token.model.Users.Role;
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UsersService {
 	public AuthenticationResponse authenticate(Users request) {
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
-		Users users = userRepository.findByuserName(request.getUserName()).orElseThrow(()-> new NoUsersFoundException("No user found given user name"));
+		Users users = userRepository.findByuserName(request.getUserName()).orElseThrow(()-> new UsernameNotFoundException("No user found given user name"));
 		if (users.getIsActive()) {
 			String token = jwtService.generateToken(users);
 			return new AuthenticationResponse(token);

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import com.demo.token.dto.TopicCategoryProjection;
 import com.demo.token.model.Category;
 import com.demo.token.model.Topics;
-import com.demo.token.model.TopicSummaryView;
 
 @Repository
 public interface TopicsRepository extends JpaRepository<Topics, Long> {
@@ -32,11 +31,10 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	 * @param categoryId
 	 * @return Topics
 	 */
-	Optional<Topics> findByIdAndCategoryId(Long id, Long categoryId);
+	//Optional<Topics> findByIdAndCategoryId(Long id, Long categoryId);
 
 	@Query("SELECT t FROM Topics t WHERE t.id = :id AND t.category.uuid = :categoryUuid")
-	Optional<Topics> findByIdAndCategoryUuid(@Param("id") String topicsUuid,
-			@Param("categoryUuid") String categoryUuid);
+	Optional<Topics> findByIdAndCategoryUuid(@Param("id") String topicsUuid,@Param("categoryUuid") String categoryUuid);
 
 	/**
 	 * Too find read topic's description
@@ -64,16 +62,24 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	Optional<Topics> findByCategory(Category category);
 
 	/**
-	 * To find a topics based on
+	 * To find a topics under category
 	 * 
 	 * @param categoryUuid
 	 * @return List of Topics
 	 */
 	List<Topics> findByCategoryUuid(String categoryUuid);
-
+	
+	/**
+	 * 
+	 * @param uuid
+	 * @return boolean result
+	 */
 	boolean existsByUuid(String uuid);
 	
+	/**
+	 * To find All Topics  
+	 * @return List of Topics By  IsActive is true 
+	 */
 	List<Topics> findByIsActiveTrue();
 	
-
 }

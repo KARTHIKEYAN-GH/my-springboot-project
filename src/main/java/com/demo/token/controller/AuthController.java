@@ -1,7 +1,6 @@
 package com.demo.token.controller;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -61,9 +60,9 @@ public class AuthController {
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		} 
-		//catch (Exception e) {
-//			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-//		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+		}
 	}
 
 	/**
@@ -79,11 +78,13 @@ public class AuthController {
 			return ResponseEntity.ok(response);
 		} catch (UsernameNotFoundException e) {
 			// Handle case where the userName does not exist
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
-		} catch (BadCredentialsException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+		} 
+		catch (BadCredentialsException e) {
 			// Handle case where the credentials are invalid
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password.");
-		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid usernamee or password.");
+		} 
+		catch (IllegalStateException e) {
 			// Handle case where the user is inactive
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		} catch (Exception e) {
@@ -130,7 +131,7 @@ public class AuthController {
 		} catch (IllegalStateException e) {
 		    // Handle specific exception when trying to deactivate an admin
 		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		} catch (NoSuchElementException | IllegalArgumentException e) {
+		} catch (IllegalArgumentException e) {
 		    // Handle UUID not found or wrong UUID format scenarios
 		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid or non-existent UUID"+ e.getMessage());
 		} catch (Exception ex) {
