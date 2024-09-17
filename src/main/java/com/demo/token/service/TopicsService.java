@@ -18,7 +18,7 @@ public interface TopicsService {
 	 * @param description  category description
 	 * @return topics
 	 */
-	Topics addTopics(String categoryUuid, String name, String description);
+	TopicsDTO addTopics(String categoryUuid, String name, String description);
 
 	/**
 	 * To converts entity to DTO

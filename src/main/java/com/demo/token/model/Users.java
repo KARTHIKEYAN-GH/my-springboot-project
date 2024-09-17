@@ -89,10 +89,20 @@ public class Users {
 	 */
 	private String serach;
 
+	/**
+	 * Enum representing the various roles a user can have within the system.
+	 * This includes:
+	 * ADMIN: Has full access and can manage users.
+	 * TRAINEE: Can log in, add categories, and manage topics under specific categories.
+	 * ATTENDEE: Has read-only access to view categories and topics.
+	 */
 	public enum Role {
 		ADMIN, TRAINEE, ATTENDEE
 	}
-
+	/**
+	 * Stores the user's role.
+	 * Saved as a string (e.g., "ADMIN") in the database.
+	 */
 	@Enumerated(EnumType.STRING)
 	private Role role;
 

@@ -2,7 +2,8 @@ package com.demo.token.serviceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
+import java.util.function.Predicate; 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +18,7 @@ import com.demo.token.model.Users.Role;
 import com.demo.token.repo.UserRepository;
 import com.demo.token.service.MailService;
 import com.demo.token.service.UsersService;
+import com.demo.token.validation.EmailValidator;
 import com.demo.token.validation.PhoneNumberValidation;
 
 import jakarta.transaction.Transactional;
@@ -79,14 +81,10 @@ public class UserServiceImpl implements UsersService {
 		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format.");
 		}
-		if (!users.getEmail().contains("@gmail.com") || !users.getEmail().endsWith(".com")) {
-			throw new IllegalArgumentException("Invalid email, Please check your email.");
-		}
-		// if(!EmailValidator.isValid(users.getEmail()))
-		// {
-		// throw new IllegalArgumentException("Invalid email, Please check your
-		// email.");
-		// }
+		 if(!EmailValidator.isValid(users.getEmail()))
+		 {
+		 throw new IllegalArgumentException("Invalid email, Please check your email.");
+		 }
 		Optional<Users> existingUser = userRepository.findByuserNameAndIsActive(users.getUserName(), true);
 		if (existingUser.isPresent()) {
 			throw new IllegalStateException("A user with this userName already exists and is active.");
@@ -97,19 +95,6 @@ public class UserServiceImpl implements UsersService {
 			throw new IllegalStateException("Phone number is already exist.");
 		}
 
-		// Check if an ADMIN already exists; only one ADMIN is allowed
-//		if (users.getRole().equals(Role.ADMIN)) {
-//			Optional<Users> existingAdmin = userRepository.findByRole(Role.ADMIN);
-//			if (existingAdmin.isPresent()) {
-//				throw new IllegalStateException(
-//						"Only one ADMIN is allowed. The existing ADMIN can create users with roles TRAINEE or ATTENDEE.");
-//			}
-			
-//		if(users.getRole().equals(Role.ADMIN))
-//		{
-//			throw new IllegalStateException("Please check your role(TRAINEE or ATTENDEE)");
-//		
-//		}
 		if(users.getRole().equals(Role.TRAINEE)||users.getRole().equals(Role.ATTENDEE))
 		{
 		mailService.sendEmail(users.getEmail(), users.getName(), users.getEmail(), users.getPhoneNumber(),
@@ -126,8 +111,13 @@ public class UserServiceImpl implements UsersService {
 
 		}
 	}
+	
 	@Override
 	public AuthenticationResponse authenticate(Users request) {
+		if(request.getUserName()==null || request.getPassword()==null)
+		{
+			throw new IllegalArgumentException("UserName and Password should not be Empty");
+		}
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
 		Users users = userRepository.findByuserName(request.getUserName()).orElseThrow(()-> new UsernameNotFoundException("No user found given user name"));
@@ -139,6 +129,7 @@ public class UserServiceImpl implements UsersService {
 			throw new IllegalStateException("User is inactive. Please contact Admin.");
 		}
 	}
+	
 	@Override
 	@Transactional
 	public Users updateUser(String uuid, Users users) {
@@ -189,15 +180,20 @@ public class UserServiceImpl implements UsersService {
 	}
 	@Override
 	public List<UsersDTO> getAllUsers() {
-		List<Users> users=userRepository.findAll();
-		if(users.isEmpty() || users.stream().allMatch(user -> user.getRole().equals(Role.ADMIN))) 
-		{
-			throw new ResourceNotFoundException("No User Founds");
-		}
-		return users.stream()// Convert list to Stream 
-				.map(this::convertToDTO) // Convert each Users to UsersDTO
-				.collect(Collectors.toList());// Collect results into a List<UsersDTO>
+	    List<Users> users = userRepository.findAll();
+
+	    if (users.isEmpty()) {
+	        throw new ResourceNotFoundException("No Users Found");
+	    }
+
+	    // Convert each Users entity to UsersDTO, omitting users with the ADMIN role
+	    return users.stream() // Convert list to Stream
+	                .filter(user -> !user.getRole().equals(Role.ADMIN)) // Exclude ADMIN users
+	                .map(this::convertToDTO) // Convert each Users to UsersDTO
+	                .collect(Collectors.toList()); // Collect results into a List<UsersDTO>
 	}
+
+
 	@Override
 	public List<UsersDTO> getAllActiveUsers() {
 		return userRepository.findByIsActiveTrue().stream().map(this::convertToDTO).collect(Collectors.toList());

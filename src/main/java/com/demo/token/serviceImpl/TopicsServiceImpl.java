@@ -71,21 +71,7 @@ public class TopicsServiceImpl implements TopicsService {
 		this.topicsReadStatusService = topicsReadStatusService;
 	}
 
-	public Topics addTopics(String categoryUuid, String name, String description) {
-		Optional<Category> category = categoryService.findByUuid(categoryUuid);
-		if (category.isPresent()) {
-			Category categories = category.get();
-			Topics topics = new Topics();
-			topics.setName(name);
-			topics.setDescription(description);
-			topics.setCategory(categories);
-			topics.setActive(true);
-			return topicsRepository.save(topics);
-		} else {
-			throw new IllegalArgumentException("Category not found with UUID: " + categoryUuid);
-		}
-	}
-
+	
 	@Override
 	public TopicsDTO convertsToDTO(Topics topics) {
 		return new TopicsDTO(topics.getUuid(), topics.getName(), topics.getCreatedBy());
@@ -96,16 +82,25 @@ public class TopicsServiceImpl implements TopicsService {
 
 	}
 
-//	@Override
-//	public List<TopicsDTO> getAllTopics() {
-//		List<TopicsDTO> Extopics = topicsRepository.findAll().stream()
-//				.filter(topics -> Boolean.TRUE.equals(topics.isActive())).map(this::convertsToDTO)
-//				.collect(Collectors.toList());
-//		if (Extopics.isEmpty()) {
-//			throw new IllegalArgumentException("Topcs not found ");
-//		}
-//		return Extopics;
-//	}
+	public TopicsDTO addTopics(String categoryUuid, String name, String description) {
+		if(name==null ||description==null)
+		{
+			throw new IllegalArgumentException("please provide name and description for topic");
+		}
+		Optional<Category> category = categoryService.findByUuid(categoryUuid);
+		if (category.isPresent()) {
+			Category categories = category.get();
+			Topics topics = new Topics();
+			topics.setName(name);
+			topics.setDescription(description);
+			topics.setCategory(categories);
+			topics.setActive(true);
+			Topics savedtopics= topicsRepository.save(topics);
+			 return convertsToDTO(savedtopics);
+		} else {
+			throw new IllegalArgumentException("Category not found with UUID: " + categoryUuid);
+		}
+	}
 
 	@Override
 	public List<TopicsDTO> getAllTopics() {

@@ -51,9 +51,15 @@ public class TopicsController {
 	@PostMapping("/addtopics/{categoryUuid}")
 	public ResponseEntity<?> addTopic(@PathVariable String categoryUuid, @RequestBody Topics topicRequest) {
 		try {
-			Topics topic = topicsService.addTopics(categoryUuid, topicRequest.getName(), topicRequest.getDescription());
-			return ResponseEntity.ok(topic.getName() + " Tospics Addeded Sucessfully ");
-		} catch (Exception e) {
+			TopicsDTO topic = topicsService.addTopics(categoryUuid, topicRequest.getName(), topicRequest.getDescription());
+			return ResponseEntity.ok(topic);
+		}
+		catch(IllegalArgumentException e)
+		{
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Error adding topic: " + e.getMessage());
+		}
+		catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Error adding topic: " + e.getMessage());
 		}

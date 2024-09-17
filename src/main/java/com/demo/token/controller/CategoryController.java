@@ -42,10 +42,10 @@ public class CategoryController {
 	 * @return category name
 	 */
 	@PostMapping("/addCategories")
-	public ResponseEntity<String> addCategory(@RequestBody Category category) {
+	public ResponseEntity<?> addCategory(@RequestBody Category category) {
 		try {
-			Category newcategories = categoryService.addCategory(category);
-			return ResponseEntity.ok(newcategories.getName() + " saved sucessfully");
+			CatregoryDTO newcategories = categoryService.addCategory(category);
+			return ResponseEntity.ok(newcategories);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("Error saving category: " + e.getMessage());

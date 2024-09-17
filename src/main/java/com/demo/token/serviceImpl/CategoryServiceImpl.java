@@ -22,14 +22,25 @@ public class CategoryServiceImpl implements CategoryService {
 		this.categoryRepository = categoryRepository;
 	}
 
-	@Override
-	public Category addCategory(Category category) {
-		category.setActive(true);
-		return categoryRepository.save(category);
-	}
+//	@Override
+//	public CatregoryDTO addCategory(Category category) {
+//		category.setActive(true);
+//		return categoryRepository.save(category);
+//	}
 
 	public CatregoryDTO convertsToDTO(Category category) {
 		return new CatregoryDTO(category.getUuid(), category.getName(), category.getCreatedBY());
+	}
+	@Override
+	public CatregoryDTO addCategory(Category category) {
+		if(category.getName()==null)
+		{
+			throw new IllegalArgumentException("please provide name for the category");
+		}
+		category.setActive(true);
+		 //categoryRepository.save(category);
+		 Category savedCategory = categoryRepository.save(category);
+		 return convertsToDTO(savedCategory);
 	}
 
 //	@Override

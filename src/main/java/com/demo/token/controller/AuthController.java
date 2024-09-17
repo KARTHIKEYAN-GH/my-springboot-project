@@ -87,7 +87,13 @@ public class AuthController {
 		catch (IllegalStateException e) {
 			// Handle case where the user is inactive
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		} catch (Exception e) {
+		}
+		catch(IllegalArgumentException e)
+		{
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+
+		}
+		catch (Exception e) {
 			// Handle any other unexpected errors
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("An error occurred during authentication.");

@@ -12,7 +12,7 @@ public interface CategoryService {
 	 * @param category
 	 * @return category
 	 */
-	Category addCategory(Category category);
+	CatregoryDTO addCategory(Category category);
 	
 	/**
 	 * To get All categories
