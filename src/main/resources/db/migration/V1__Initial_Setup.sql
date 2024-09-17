@@ -8,11 +8,14 @@ CREATE TABLE IF NOT EXISTS users (
     password VARCHAR(255) NOT NULL,
     role ENUM('ADMIN','TRAINEE','ATTENDEE') NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
+    created_by VARCHAR(50) DEFAULT 'system' , 
+    updated_by VARCHAR(50), 
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    version BIGINT NOT NULL DEFAULT 0
-);
+    version BIGINT NOT NULL DEFAULT 0,
+    serach VARCHAR(250)
+    );
 
 -- Default Admin User
 INSERT INTO users (id,uuid,name, phone_number, email, user_name, password, role) VALUES
-(NULL,UUID(),'Admin User', '6383804074', 'admin@gmail.com', 'Admin', '$2a$10$sRxo7sgi4elrPdboR7jucutOC6AR3yzcDG7z2zHZmvaXr1Dablr5K', 'ADMIN');
+(NULL,UUID(),'Admin User', '+6383804074', 'admin@gmail.com', 'Admin', '$2a$10$sRxo7sgi4elrPdboR7jucutOC6AR3yzcDG7z2zHZmvaXr1Dablr5K', 'ADMIN');

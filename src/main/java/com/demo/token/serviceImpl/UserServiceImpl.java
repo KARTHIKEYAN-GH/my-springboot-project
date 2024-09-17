@@ -156,6 +156,17 @@ public class UserServiceImpl implements UsersService {
 	    }
 		Users user = userRepository.findByUuid(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
+		if(user.getRole().equals(Role.ADMIN))
+		{
+		user.setName(users.getName());
+		user.setEmail(users.getEmail());
+		user.setPhoneNumber(users.getPhoneNumber());
+		user.setUserName(users.getUserName());
+		user.setPassword(passwordEncoder.encode(users.getPassword()));
+		user.setRole(Role.ADMIN);
+		user.setIsActive(true);
+		}
+		else {
 		user.setName(users.getName());
 		user.setEmail(users.getEmail());
 		user.setPhoneNumber(users.getPhoneNumber());
@@ -165,7 +176,7 @@ public class UserServiceImpl implements UsersService {
 			throw new IllegalStateException("Invalid Role");
 		}
 		user.setRole(users.getRole());
-		user.setIsActive(true);
+		user.setIsActive(true);}
 		return userRepository.save(user);
 	}
 	@Override

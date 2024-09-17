@@ -101,7 +101,7 @@ public class Users {
 	}
 	/**
 	 * Stores the user's role.
-	 * Saved as a string (e.g., "ADMIN") in the database.
+	 * Saved as a ENUM (e.g., "ADMIN") in the database.
 	 */
 	@Enumerated(EnumType.STRING)
 	private Role role;
