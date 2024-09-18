@@ -3,7 +3,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.function.Predicate; 
+import java.util.function.Predicate;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,8 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.AuthenticationResponse;
+import com.demo.token.dto.TopicsDTO;
 import com.demo.token.dto.UsersDTO;
 import com.demo.token.exception.ResourceNotFoundException;
+import com.demo.token.model.Topics;
 import com.demo.token.model.Users;
 import com.demo.token.model.Users.Role;
 import com.demo.token.repo.UserRepository;
@@ -53,24 +57,39 @@ public class UserServiceImpl implements UsersService {
 	 * Responsible for sending email to user after succssfull registration
 	 */
 	private final MailService mailService;
+	/**
+	 * Responsible for automating the conversion between different object models,
+	 * Used to map fields from one object to another based on their field names and types.
+	 */
+	private final ModelMapper modelMapper;
 
 	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-			AuthenticationManager authenticationManager, JwtService jwtService, MailService mailService) {
+			AuthenticationManager authenticationManager, JwtService jwtService, MailService mailService, ModelMapper modelMapper) {
 		super();
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.authenticationManager = authenticationManager;
 		this.jwtService = jwtService;
 		this.mailService = mailService;
+		this.modelMapper = modelMapper;
 	}
 
 	public UsersDTO convertToDTO(Users users) {
-
-		return new UsersDTO(users.getUuid(), users.getName(), users.getEmail(), users.getUserName(), users.getRole(),
-				users.getIsActive(),
-				"User Sucessfully Registered , Please check your mail for further access's credentials ");
-
+		UsersDTO usersDTO= modelMapper.map(users,UsersDTO.class);
+		usersDTO.setMessage("User Sucessfully Registered ");
+		return usersDTO;
+//		return new UsersDTO(users.getUuid(), users.getName(), users.getEmail(), users.getUserName(), users.getRole(),
+//				users.getIsActive(),
+//				"User Sucessfully Registered , Please check your mail for further access's credentials ");
+//		
 	}
+	
+//	public UsersDTO convertsToDTO(Users users) {
+//		 return modelMapper.typeMap(users, UsersDTO.class).addMappings(mapper->{mapper.skip(UsersDTO::setMessage);
+//		});
+//	}
+//	
+	
 	@Override
 	@Transactional
 	public UsersDTO createUser(Users users) {
@@ -103,7 +122,9 @@ public class UserServiceImpl implements UsersService {
 		users.setPassword(passwordEncoder.encode(users.getPassword()));
 
 		Users savedUsers = userRepository.save(users);
-		return convertToDTO(savedUsers);
+		UsersDTO usersDTO=convertToDTO(savedUsers);
+		usersDTO.setMessage("User Sucessfully Register as "+"\"" + users.getRole()+ "\""+" please check your mail for login credentials");
+		return usersDTO;
 		}
 		else
 		{
@@ -133,6 +154,10 @@ public class UserServiceImpl implements UsersService {
 	@Override
 	@Transactional
 	public Users updateUser(String uuid, Users users) {
+		
+		Users user = userRepository.findByUuid(uuid)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
+		
 		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
 				|| users.getEmail() == null) {
 			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
@@ -154,8 +179,7 @@ public class UserServiceImpl implements UsersService {
 	    {
 	    	throw new IllegalArgumentException("A user with this userName already exist");
 	    }
-		Users user = userRepository.findByUuid(uuid)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
+		
 		if(user.getRole().equals(Role.ADMIN))
 		{
 		user.setName(users.getName());
@@ -163,7 +187,7 @@ public class UserServiceImpl implements UsersService {
 		user.setPhoneNumber(users.getPhoneNumber());
 		user.setUserName(users.getUserName());
 		user.setPassword(passwordEncoder.encode(users.getPassword()));
-		user.setRole(Role.ADMIN);
+		user.setRole(users.getRole());
 		user.setIsActive(true);
 		}
 		else {
@@ -196,12 +220,11 @@ public class UserServiceImpl implements UsersService {
 	    if (users.isEmpty()) {
 	        throw new ResourceNotFoundException("No Users Found");
 	    }
-
 	    // Convert each Users entity to UsersDTO, omitting users with the ADMIN role
-	    return users.stream() // Convert list to Stream
+	    return users.stream() 										// Convert list to Stream
 	                .filter(user -> !user.getRole().equals(Role.ADMIN)) // Exclude ADMIN users
-	                .map(this::convertToDTO) // Convert each Users to UsersDTO
-	                .collect(Collectors.toList()); // Collect results into a List<UsersDTO>
+	                .map(this::convertToDTO) 					// Convert each Users to UsersDTO
+	                .collect(Collectors.toList()); 				// Collect results into a List<UsersDTO>
 	}
 
 

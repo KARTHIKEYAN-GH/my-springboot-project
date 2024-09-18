@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.CatregoryDTO;
@@ -17,19 +18,20 @@ public class CategoryServiceImpl implements CategoryService {
 	 * Used to interact with category table to perform CRUD Operation
 	 */
 	private final CategoryRepository categoryRepository;
-
-	CategoryServiceImpl(CategoryRepository categoryRepository) {
+	/**
+	 * Responsible for automating the conversion between different object models,
+	 * Used to map fields from one object to another based on their field names and types.
+	 */
+	private final ModelMapper modelMapper;
+	CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
 		this.categoryRepository = categoryRepository;
+		this.modelMapper = modelMapper;
 	}
 
-//	@Override
-//	public CatregoryDTO addCategory(Category category) {
-//		category.setActive(true);
-//		return categoryRepository.save(category);
-//	}
 
 	public CatregoryDTO convertsToDTO(Category category) {
-		return new CatregoryDTO(category.getUuid(), category.getName(), category.getCreatedBY());
+		//return new CatregoryDTO(category.getUuid(), category.getName(), category.getCreatedBY());
+		return modelMapper.map(category, CatregoryDTO.class);
 	}
 	@Override
 	public CatregoryDTO addCategory(Category category) {

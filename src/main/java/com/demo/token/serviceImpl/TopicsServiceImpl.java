@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -60,22 +61,35 @@ public class TopicsServiceImpl implements TopicsService {
 	 * helps in implementing features like marking topics as read.
 	 */
 	private final TopicsReadStatusService topicsReadStatusService;
+	/**
+	 * Responsible for automating the conversion between different object models,
+	 * Used to map fields from one object to another based on their field names and types.
+	 */
+	private final ModelMapper modelmapper;
 
 	public TopicsServiceImpl(TopicsRepository topicsRepository, JwtService jwtservice, UsersService usersService,
-			CategoryService categoryService, TopicsReadStatusService topicsReadStatusService) {
+			CategoryService categoryService, TopicsReadStatusService topicsReadStatusService, ModelMapper modelmapper) {
 		super();
 		this.jwtservice = jwtservice;
 		this.topicsRepository = topicsRepository;
 		this.categoryService = categoryService;
 		this.usersService = usersService;
 		this.topicsReadStatusService = topicsReadStatusService;
+		this.modelmapper = modelmapper;
 	}
 
 	
 	@Override
 	public TopicsDTO convertsToDTO(Topics topics) {
-		return new TopicsDTO(topics.getUuid(), topics.getName(), topics.getCreatedBy());
+		//return new TopicsDTO(topics.getUuid(), topics.getName(), topics.getCreatedBy());
+	    modelmapper.typeMap(Topics.class, TopicsDTO.class).addMappings(mapper -> {
+	        mapper.map(Topics::getName, TopicsDTO::setTopic_Name);
+	    });
+
+	    // Perform the mapping
+	    return modelmapper.map(topics, TopicsDTO.class);
 	}
+
 
 	public List<Topics> getTopicsbycategoryUuid(String Uuid) {
 		return topicsRepository.findByCategoryUuid(Uuid);

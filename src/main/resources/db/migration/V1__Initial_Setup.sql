@@ -18,4 +18,5 @@ CREATE TABLE IF NOT EXISTS users (
 
 -- Default Admin User
 INSERT INTO users (id,uuid,name, phone_number, email, user_name, password, role) VALUES
-(NULL,UUID(),'Admin User', '+6383804074', 'admin@gmail.com', 'Admin', '$2a$10$sRxo7sgi4elrPdboR7jucutOC6AR3yzcDG7z2zHZmvaXr1Dablr5K', 'ADMIN');
+(NULL,UUID(),'Admin User', '+6383804074', 'admin@gmail.com', 'Admin', '$2a$10$sRxo7sgi4elrPdboR7jucutOC6AR3yzcDG7z2zHZmvaXr1Dablr5K', 'ADMIN'),
+(NULL,UUID(),'Admin User2', '+8300590074', 'admin2@gmail.com', 'Admin2', '$2a$10$.1MxjBqVSTvzg6yB8cnjdOyjOQoFiVM0/m25ZJnmTutPQCLFdGq4q', 'ADMIN');
