@@ -34,12 +34,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	 */
 	@Autowired
 	private UserDetailsServiceImp userDetailsService;
-
+	
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+	    String path = request.getRequestURI();
+	    // Exclude login and registration from JWT validation
+	    return path.equals("/api/user/login");
+	}	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
 			throws ServletException, IOException {
 		final String authorizationHeader = request.getHeader("Authorization");
-		System.out.println("Authorization Header: " + authorizationHeader);
+		if(authorizationHeader!=null)
+		{
+			System.out.println("Authorization Header: " + authorizationHeader);
 
 		String username = null;
 		String jwt = null;
@@ -77,6 +85,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			System.err.println("Exception: " + ex.getMessage());
 			sendErrorResponse(response, "An error occurred while processing the token");
 		}
+		}
+		else
+		{
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST); // Set the status code to 400
+			sendErrorResponse(response, "Missing Token");
+			System.err.println("Authorization Header: " + authorizationHeader);
+		}
+		
 	}
 
 	private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
