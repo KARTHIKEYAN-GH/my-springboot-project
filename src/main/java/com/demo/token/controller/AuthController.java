@@ -60,8 +60,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		} catch (IllegalStateException e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		} 
-		catch (Exception e) {
+		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		}
 	}
@@ -80,21 +79,16 @@ public class AuthController {
 		} catch (UsernameNotFoundException e) {
 			// Handle case where the userName does not exist
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-		} 
-		catch (BadCredentialsException e) {
+		} catch (BadCredentialsException e) {
 			// Handle case where the credentials are invalid
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid usernamee or password.");
-		} 
-		catch (IllegalStateException e) {
+		} catch (IllegalStateException e) {
 			// Handle case where the user is inactive
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-		}
-		catch(IllegalArgumentException e)
-		{
+		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			// Handle any other unexpected errors
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("An error occurred during authentication.");
@@ -115,11 +109,9 @@ public class AuthController {
 			return ResponseEntity.ok("User updated successfully");
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}catch(ResourceNotFoundException e)
-		{
+		} catch (ResourceNotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("an error occured ");
 		}
 	}
@@ -134,20 +126,15 @@ public class AuthController {
 	public ResponseEntity<String> deactiveUser(@PathVariable String Uuid) {
 		try {
 			Optional<String> userName = userService.deactiveUser(Uuid);
-			if (userName.isPresent()) {
-				return ResponseEntity.ok("User " + userName.get() + " Deletted Sucessfully ");
-			} else {
-				return ResponseEntity.ok("User not found or Faild to deltte");
-			}
-		} catch (IllegalStateException e) {
-		    // Handle specific exception when trying to deactivate an admin
-		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.ok("User " + userName.get() + " Deletted Sucessfully ");
 		} catch (IllegalArgumentException e) {
-		    // Handle UUID not found or wrong UUID format scenarios
-		    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid or non-existent UUID"+ e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (IllegalStateException e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		} catch (Exception ex) {
-		    // Handle other unexpected exceptions
-		    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred: " + ex.getMessage());
+			// Handle other unexpected exceptions
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An error occurred: " + ex.getMessage());
 		}
 	}
 
@@ -159,22 +146,18 @@ public class AuthController {
 	@GetMapping("/getAllUsers")
 	public ResponseEntity<?> getAllUsers() {
 		try {
-		List<UsersDTO> allUsers = userService.getAllUsers();
-		if(allUsers.isEmpty())
-		{
-			throw new NoUsersFoundException("No User Found");
-		}
-		else
-		{
-			return ResponseEntity.ok(allUsers);
-		}
-		}
-		catch(Exception e)
-		{
+			List<UsersDTO> allUsers = userService.getAllUsers();
+			if (allUsers.isEmpty()) {
+				throw new NoUsersFoundException("No User Found");
+			} else {
+				return ResponseEntity.ok(allUsers);
+			}
+		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
-		
+
 	}
+
 	/**
 	 * To get all Active Users
 	 * 
@@ -240,20 +223,23 @@ public class AuthController {
 	 */
 	@GetMapping("/getUserBy/{Uuid}")
 	public ResponseEntity<?> getUserByUuid(@PathVariable String Uuid) {
-		Optional<Users> existingUser = userService.getUsersByUuid(Uuid);
-		if (existingUser.isPresent()) {
+		try {
+			Optional<Users> existingUser = userService.getUsersByUuid(Uuid);
 			return ResponseEntity.ok(existingUser);
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No User Found ");
 	}
-	
+
 	@GetMapping("/search/{name}")
-    public ResponseEntity<List<UsersDTO>> getAllUserByName(@PathVariable String name) {
-        List<UsersDTO> allUsers = userService.findAllByNameContaining(name);
-        if (allUsers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
-        } else {
-            return ResponseEntity.ok(allUsers);
-        }
-    }
+	public ResponseEntity<List<UsersDTO>> getAllUserByName(@PathVariable String name) {
+		List<UsersDTO> allUsers = userService.findAllByNameContaining(name);
+		if (allUsers.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+		} else {
+			return ResponseEntity.ok(allUsers);
+		}
+	}
 }

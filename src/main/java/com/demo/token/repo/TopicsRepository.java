@@ -70,9 +70,10 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	List<Topics> findByCategoryUuid(String categoryUuid);
 	
 	/**
-	 * 
-	 * @param uuid
-	 * @return boolean result
+	 * Checks if a record exists with the given UUID.
+	 *
+	 * @param uuid The UUID of the record to check for existence.
+	 * @return {@code true} if a record with the specified UUID exists, {@code false} otherwise.
 	 */
 	boolean existsByUuid(String uuid);
 	

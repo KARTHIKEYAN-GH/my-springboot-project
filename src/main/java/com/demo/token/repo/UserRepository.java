@@ -82,7 +82,20 @@ public interface UserRepository extends JpaRepository<Users, Long> {
 	 * @return active User
 	 */
 	Optional<Users> findByPhoneNumberAndIsActive(String phoneNumber, boolean b);
-
+	
+	/**
+	 * To get all active users from DB except admin
+	 * @param role
+	 * @return List of active users of both role("TRAINEE" and "ATTENDEE")
+	 */
+    List<Users> findByIsActiveTrueAndRoleNot(Role role);
+	/**
+	 * 
+	 * @param name
+	 * @return list of active users from DB
+	 */
 	// Search by partial match
-	List<Users> findByNameContaining(String name);
+	List<Users> findByNameContainingAndIsActive(String name,boolean b);
+	
+
 }
