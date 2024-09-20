@@ -135,8 +135,11 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	public AuthenticationResponse authenticate(Users request) {
-		if (request.getUserName() == null || request.getPassword() == null) {
+		if (request.getUserName() == null && request.getPassword() == null) {
 			throw new IllegalArgumentException("UserName and Password should not be Empty");
+		}
+		if (request.getUserName() == null || request.getPassword() == null) {
+			throw new IllegalArgumentException("Missing  userName or Password");
 		}
 		authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
@@ -221,9 +224,9 @@ public class UserServiceImpl implements UsersService {
 		if (users.isEmpty()) {
 			throw new ResourceNotFoundException("No Users Found");
 		}
-		return users.stream() 										// Convert list to Stream
-				.map(this::convertToDTO) 							// Convert each Users to UsersDTO
-				.collect(Collectors.toList()); 						// Collect results into a List<UsersDTO>
+		return users.stream() // Convert list to Stream
+				.map(this::convertToDTO) // Convert each Users to UsersDTO
+				.collect(Collectors.toList()); // Collect results into a List<UsersDTO>
 	}
 
 	@Override
@@ -250,7 +253,8 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	public Optional<Users> getUsersByUuid(String Uuid) {
-		Users users1=userRepository.findByUuid(Uuid).orElseThrow(()->  new IllegalArgumentException("No user founs this uuid"));
+		Users users1 = userRepository.findByUuid(Uuid)
+				.orElseThrow(() -> new IllegalArgumentException("No user founs this uuid"));
 		return Optional.of(users1);
 
 	}
@@ -262,6 +266,7 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	public List<UsersDTO> findAllByNameContaining(String name) {
-		return userRepository.findByNameContainingAndIsActive(name,true).stream().map(this::convertToDTO).collect(Collectors.toList());
+		return userRepository.findByNameContainingAndIsActive(name, true).stream().map(this::convertToDTO)
+				.collect(Collectors.toList());
 	}
 }

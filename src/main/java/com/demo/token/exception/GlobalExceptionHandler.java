@@ -4,45 +4,52 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import io.jsonwebtoken.security.SignatureException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
-    }
-    @ExceptionHandler(SignatureException.class)
-    public ResponseEntity<String> handleSignatureException(SignatureException ex) {
-        // Return a response entity with the message and HTTP status code
-        return new ResponseEntity<>("Invalid token or expired", HttpStatus.UNAUTHORIZED);
-    }
-    
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex)
-    {
-    	return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
-    }
-    
-    @ExceptionHandler(TopicNotFoundException.class)
-    public ResponseEntity<String> handleTopicNotFoundException(TopicNotFoundException ex)
-    {
-    	return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
-    }
-    @ExceptionHandler(NoUsersFoundException.class)
-    public ResponseEntity<String> handleNoUsersFoundException(NoUsersFoundException ex)
-    {
-		return new ResponseEntity<>(ex.getMessage(),HttpStatus.NOT_FOUND);
-    }
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String>handleIllegalArgumentException(IllegalArgumentException ex)
-    {
-		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleGenericException(Exception ex) {
-        return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+	}
+
+	@ExceptionHandler(SignatureException.class)
+	public ResponseEntity<String> handleSignatureException(SignatureException ex) {
+		// Return a response entity with the message and HTTP status code
+		return new ResponseEntity<>("Invalid token or expired", HttpStatus.UNAUTHORIZED);
+	}
+
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(TopicNotFoundException.class)
+	public ResponseEntity<String> handleTopicNotFoundException(TopicNotFoundException ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(NoUsersFoundException.class)
+	public ResponseEntity<String> handleNoUsersFoundException(NoUsersFoundException ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> handleGenericException(Exception ex) {
+		return new ResponseEntity<>("An error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public String handle404(NoHandlerFoundException ex) {
+		return "The requested path was not found"; // Customize this message as needed
+	}
 }
