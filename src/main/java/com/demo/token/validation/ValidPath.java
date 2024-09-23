@@ -56,7 +56,6 @@ public class ValidPath {
 		// Return true if the path is in the set, false otherwise
 		// return validPath.contains(path);
 		return validPath.stream().anyMatch(pattern -> pathMatcher.match(pattern, path));
-
 	}
 
 	public static void main(String[] args) {

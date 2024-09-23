@@ -34,7 +34,7 @@ public class AuthController {
 	 * Service layer dependency for business logic related to User entity
 	 * Constructor to inject the UsersService dependency.
 	 * 
-	 * @param userService The service that handles the business logic for topics.
+	 * @param userService The service that handles the business logic for users.
 	 *                    Dependency Injection is used here to ensure the controller
 	 *                    can access the service methods.
 	 */
@@ -81,7 +81,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		} catch (BadCredentialsException e) {
 			// Handle case where the credentials are invalid
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid usernamee or password.");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		} catch (IllegalStateException e) {
 			// Handle case where the user is inactive
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());

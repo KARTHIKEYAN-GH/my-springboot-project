@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,12 +88,6 @@ public class UserServiceImpl implements UsersService {
 //		
 	}
 
-//	public UsersDTO convertsToDTO(Users users) {
-//		 return modelMapper.typeMap(users, UsersDTO.class).addMappings(mapper->{mapper.skip(UsersDTO::setMessage);
-//		});
-//	}
-//	
-
 	@Override
 	@Transactional
 	public UsersDTO createUser(Users users) {
@@ -124,11 +119,11 @@ public class UserServiceImpl implements UsersService {
 
 			Users savedUsers = userRepository.save(users);
 			UsersDTO usersDTO = convertToDTO(savedUsers);
-			usersDTO.setMessage("User Sucessfully Register as " + "\"" + users.getRole() + "\""
+			usersDTO.setMessage("User Sucessfully Register as " + "" + users.getRole() + ""
 					+ " please check your mail for login credentials");
 			return usersDTO;
 		} else {
-			throw new IllegalArgumentException("Please check your role(TRAINEE or ATTENDEE)");
+			throw new IllegalArgumentException("Please check the role is either (TRAINEE or ATTENDEE)");
 
 		}
 	}
@@ -142,9 +137,14 @@ public class UserServiceImpl implements UsersService {
 			throw new IllegalArgumentException("Missing  userName or Password");
 		}
 		authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
+			.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
+		
 		Users users = userRepository.findByuserName(request.getUserName())
 				.orElseThrow(() -> new UsernameNotFoundException("No user found given user name"));
+		if(!passwordEncoder.matches(request.getPassword(), users.getPassword()))
+		{
+			throw new BadCredentialsException("Invalid password ");
+		}
 		if (users.getIsActive()) {
 			String token = jwtService.generateToken(users);
 			return new AuthenticationResponse(token);

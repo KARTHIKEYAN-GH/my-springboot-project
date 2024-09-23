@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     updated_by VARCHAR(50), -- Who last updated the user record
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- creation of timestamp
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Timestamp of last updated
-    version BIGINT NOT NULL DEFAULT 0, -- optimistic locking to identify the count of records changes 
-    serach VARCHAR(250) -- Optional search field (likely for caching search results or indexing purposes)
+    version BIGINT NOT NULL DEFAULT 0, '${my_placeholder}'-- optimistic locking to identify the count of records changes 
+    serach VARCHAR(250) --  search field (likely for caching search results or indexing purposes)
 );
 
 

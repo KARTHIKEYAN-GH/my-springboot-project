@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -58,6 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		if (!validPath.isValid(path)) {
 			sendErrorResponse(response, "Invalid url, pleach check it");
+			response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
@@ -112,10 +114,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	}
 
 	private void sendErrorResponse(HttpServletResponse response, String message) throws IOException {
-		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // Set the status code to 401
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json"); // Set the response content type to JSON
 		PrintWriter out = response.getWriter();
-		out.write("{\"error\": \"" + message + "\"}"); // Write the custom error message to the response body
-		out.flush();
+		 out.write("{\"error\": \"" + message + "\", \"details\": \"Bad request or unauthorized access\"}"); 
+		 out.flush();
 	}
 }

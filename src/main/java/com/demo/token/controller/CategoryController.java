@@ -26,7 +26,7 @@ public class CategoryController {
 	 * Constructor to inject the CategoryService dependency.
 	 * 
 	 * @param categoryService The service that handles the business logic for
-	 *                        topics. Dependency Injection is used here to ensure
+	 *                        category. Dependency Injection is used here to ensure
 	 *                        the controller can access the service methods.
 	 */
 	private final CategoryService categoryService;

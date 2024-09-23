@@ -14,6 +14,13 @@ import com.demo.token.service.TopicsViewService;
 @RequestMapping("/api/topic-view")
 public class TopicViewController {
 
+	/**Service layer dependency for business logic related to topicsViewService
+	 * Constructor to inject the topicsViewService dependency.
+	 * 
+	 * @param categoryService The service that handles the business logic for
+	 *                        topicsViewService. Dependency Injection is used here to ensure
+	 *                        the controller can access the service methods.
+	 */
 	@Autowired
 	private TopicsViewService topicsViewService;
 	
