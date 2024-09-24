@@ -1,8 +1,11 @@
 package com.demo.token.serviceImpl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import com.demo.token.model.Users.Role;
 import com.demo.token.service.MailService;
@@ -12,12 +15,12 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class MailServiceImpl implements MailService {
-	private final JavaMailSender javaMailSender;
-
-	public MailServiceImpl(JavaMailSender javaMailSender) {
-		super();
-		this.javaMailSender = javaMailSender;
-	}
+	@Autowired
+	private  JavaMailSender javaMailSender;
+	
+	@Autowired
+	private TemplateEngine templateEngine;
+	
 	@Override
 	public void sendEmail(String to, String name, String email, String phoneNumber, String userName, String password,
 			Role role) {
@@ -29,28 +32,28 @@ public class MailServiceImpl implements MailService {
 			helper.setSubject("Registration Successful");
 
 			// Create the email body with user details and a custom message
-			String emailBody = "<h3>Welcome " + name + "!</h3>"
-					+ "<p>Your registration was successful. Please find your details below:</p>"
-					+ "<h3>User Details:</h3>" + "<p><strong>Name:</strong> " + name + "</p>"
-					+ "<p><strong>Email:</strong> " + email + "</p>" + "<p><strong>PhoneNumber:</strong> " + phoneNumber
-					+ "</p>" + "<p><strong>Username:</strong> " + userName + "</p>" + "<p><strong>Password:</strong> "
-					+ password + "</p>" + "<p><strong>Role:</strong> " + role + "</p>"
-					+ "<p><strong>Is Active:</strong> true</p>" + "<p>Thank you for registering with us!</p>";
+			Context context = new Context();
+			context.setVariable("name", name);
+            context.setVariable("email", email);
+            context.setVariable("phoneNumber", phoneNumber);
+            context.setVariable("userName", userName);
+            context.setVariable("password", password);
+            context.setVariable("role", role);
 
-			helper.setText(emailBody, true); // 'true' indicates that the text contains HTML
+            // Process the HTML template with Thymeleaf
+            String htmlContent = templateEngine.process("registrationEmail", context);
 
-			javaMailSender.send(message);
-			System.out.println("Registration email sent successfully!");
+            // Set the HTML content in the email body
+            helper.setText(htmlContent, true);  // true to indicate that it is HTML
 
-		} catch (MessagingException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Error while sending email: " + e.getMessage());
-		}
-	}
+            // Send the email
+            javaMailSender.send(message);
+            System.out.println("Registration email sent successfully!");
 
-	{
-		// TODO Auto-generated method stub
-
-	}
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+    }
 
 }

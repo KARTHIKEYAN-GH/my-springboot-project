@@ -101,7 +101,7 @@ public class CategoryController {
 	 */
 	@PutMapping("/updateById/{categoryUuid}")
 	public ResponseEntity<?> updateCategoryById(@PathVariable String categoryUuid,
-			@RequestBody Category category) {
+			@Valid @RequestBody Category category) {
 		Optional<Category> existingCategory = categoryService.updateCategoryByUuid(categoryUuid, category);
 
 		if (existingCategory.isPresent()) {

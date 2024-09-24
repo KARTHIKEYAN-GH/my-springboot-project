@@ -3,30 +3,23 @@ package com.demo.token.serviceImpl;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.function.Predicate;
 
-import org.modelmapper.ModelMapper;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.AuthenticationResponse;
-import com.demo.token.dto.TopicsDTO;
 import com.demo.token.dto.UsersDTO;
 import com.demo.token.exception.ResourceNotFoundException;
-import com.demo.token.model.Topics;
 import com.demo.token.model.Users;
 import com.demo.token.model.Users.Role;
 import com.demo.token.repo.UserRepository;
-import com.demo.token.service.MailService;
 import com.demo.token.service.UsersService;
+import com.demo.token.serviceutility.UtilService;
 import com.demo.token.validation.EmailValidator;
 import com.demo.token.validation.PhoneNumberValidation;
 
@@ -38,53 +31,17 @@ public class UserServiceImpl implements UsersService {
 	 * Repository for performing CRUD operations on Users table. Used to interact
 	 * with the database for managing users-related data.
 	 */
-	private final UserRepository userRepository;
+	@Autowired
+	private UserRepository userRepository;
 
-	/**
-	 * Encode a provide password. This ensures that user passwords are not stored in
-	 * plain text, enhancing security.
-	 */
-
-	private final PasswordEncoder passwordEncoder;
-
-	/**
-	 * Manage authentication process by provided credentials compare against with
-	 * stored credentials
-	 */
-	private final AuthenticationManager authenticationManager;
-
-	/**
-	 * Used to extract role from Authorization Header
-	 */
-	private final JwtService jwtService;
-
-	/**
-	 * Responsible for sending email to user after succssfull registration
-	 */
-	private final MailService mailService;
-	/**
-	 * Responsible for automating the conversion between different object models,
-	 * Used to map fields from one object to another based on their field names and
-	 * types.
-	 */
-	private final ModelMapper modelMapper;
-
-	public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder,
-			AuthenticationManager authenticationManager, JwtService jwtService, MailService mailService,
-			ModelMapper modelMapper) {
-		super();
-		this.userRepository = userRepository;
-		this.passwordEncoder = passwordEncoder;
-		this.authenticationManager = authenticationManager;
-		this.jwtService = jwtService;
-		this.mailService = mailService;
-		this.modelMapper = modelMapper;
-	}
+	@Autowired
+	private UtilService utilService;
 
 	public UsersDTO convertToDTO(Users users) {
-		UsersDTO usersDTO = modelMapper.map(users, UsersDTO.class);
+		UsersDTO usersDTO = utilService.getModelMapper().map(users, UsersDTO.class);
 		usersDTO.setMessage("User Sucessfully Registered ");
 		return usersDTO;
+
 //		return new UsersDTO(users.getUuid(), users.getName(), users.getEmail(), users.getUserName(), users.getRole(),
 //				users.getIsActive(),
 //				"User Sucessfully Registered , Please check your mail for further access's credentials ");
@@ -94,10 +51,6 @@ public class UserServiceImpl implements UsersService {
 	@Override
 	@Transactional
 	public UsersDTO createUser(Users users) {
-//		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
-//				|| users.getEmail() == null) {
-//			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
-//		}
 		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format.");
 		}
@@ -115,10 +68,10 @@ public class UserServiceImpl implements UsersService {
 		}
 
 		if (users.getRole().equals(Role.TRAINEE) || users.getRole().equals(Role.ATTENDEE)) {
-			mailService.sendEmail(users.getEmail(), users.getName(), users.getEmail(), users.getPhoneNumber(),
-					users.getUserName(), users.getPassword(), users.getRole());
+			utilService.getMailService().sendEmail(users.getEmail(), users.getName(), users.getEmail(),
+					users.getPhoneNumber(), users.getUserName(), users.getPassword(), users.getRole());
 			users.setIsActive(true);
-			users.setPassword(passwordEncoder.encode(users.getPassword()));
+			users.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
 
 			Users savedUsers = userRepository.save(users);
 			UsersDTO usersDTO = convertToDTO(savedUsers);
@@ -132,38 +85,32 @@ public class UserServiceImpl implements UsersService {
 	}
 
 	@Override
-
 	public AuthenticationResponse authenticate(Users request) {
-		if (request.getUserName() == null && request.getPassword() == null) {
-			throw new IllegalArgumentException("UserName and Password should not be Empty");
-		}
-		if (request.getUserName() == null || request.getPassword() == null) {
-			throw new IllegalArgumentException("Missing  userName or Password");
-		}
+//		if (request.getUserName() == null && request.getPassword() == null) {
+//			throw new IllegalArgumentException("UserName and Password should not be Empty");
+//		}
+//		if (request.getUserName() == null || request.getPassword() == null) {
+//			throw new IllegalArgumentException("Missing  userName or Password");
+//		}
 		try {
 			UsernamePasswordAuthenticationToken tokenn = new UsernamePasswordAuthenticationToken(request.getUserName(),
 					request.getPassword());
-			// Before authentication 
+			// Before authentication
 			System.out.println("Token before authentication: " + tokenn);
-			
-			Authentication authenticatedToken = authenticationManager.authenticate(tokenn);
-			//  after authentication
+
+			Authentication authenticatedToken = utilService.getAuthenticationManager().authenticate(tokenn);
+			// after authentication
 			System.out.println("Token after authentication: " + authenticatedToken);
-			
+
 			UserDetails userDetails = (UserDetails) authenticatedToken.getPrincipal();
 			Optional<Users> users = userRepository.findByuserName(userDetails.getUsername());
-			if (users.isPresent() && users.get().getIsActive())
-			{
-				String token = jwtService.generateToken(userDetails);
+			if (users.isPresent() && users.get().getIsActive()) {
+				String token = utilService.getJwtService().generateToken(userDetails);
 				return new AuthenticationResponse(token);
-			}
-			else
-			{
+			} else {
 				throw new IllegalStateException("User is inactive. Please contact Admin.");
 			}
-		}
-		catch (AuthenticationException e)
-		{
+		} catch (AuthenticationException e) {
 			throw new BadCredentialsException(e.getMessage());
 		}
 	}
@@ -175,10 +122,10 @@ public class UserServiceImpl implements UsersService {
 		Users user = userRepository.findByUuid(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
 
-		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
-				|| users.getEmail() == null) {
-			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
-		}
+//		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
+//				|| users.getEmail() == null) {
+//			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
+//		}
 
 		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format");
@@ -201,7 +148,7 @@ public class UserServiceImpl implements UsersService {
 			user.setEmail(users.getEmail());
 			user.setPhoneNumber(users.getPhoneNumber());
 			user.setUserName(users.getUserName());
-			user.setPassword(passwordEncoder.encode(users.getPassword()));
+			user.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
 			user.setRole(users.getRole());
 			user.setIsActive(true);
 		} else {
@@ -209,7 +156,7 @@ public class UserServiceImpl implements UsersService {
 			user.setEmail(users.getEmail());
 			user.setPhoneNumber(users.getPhoneNumber());
 			user.setUserName(users.getUserName());
-			user.setPassword(passwordEncoder.encode(users.getPassword()));
+			user.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
 			if (users.getRole().equals(Role.ADMIN)) {
 				throw new IllegalStateException("Invalid Role");
 			}

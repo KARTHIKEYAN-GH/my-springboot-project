@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.demo.token.model.TopicSummaryView;
 import com.demo.token.repo.TopicViewRepository;
-import com.demo.token.repo.TopicsRepository;
 import com.demo.token.service.TopicsViewService;
 
 @Service
@@ -15,8 +14,8 @@ public class TopicsViewServiceImpl implements TopicsViewService {
 @Autowired
 private TopicViewRepository topicViewRepository;
 
-@Autowired
-private TopicsRepository topicsRepository;
+//@Autowired
+//private TopicsRepository topicsRepository;
 	@Override
 	public List<TopicSummaryView> getAllTopics() {
 		//return  topicsRepository.getAlltopics();

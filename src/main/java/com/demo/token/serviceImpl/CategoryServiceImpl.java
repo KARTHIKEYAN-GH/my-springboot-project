@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.dto.CatregoryDTO;
@@ -17,31 +18,23 @@ public class CategoryServiceImpl implements CategoryService {
 	/**
 	 * Used to interact with category table to perform CRUD Operation
 	 */
-	private final CategoryRepository categoryRepository;
-	/**
-	 * Responsible for automating the conversion between different object models,
-	 * Used to map fields from one object to another based on their field names and types.
-	 */
-	private final ModelMapper modelMapper;
-	CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
-		this.categoryRepository = categoryRepository;
-		this.modelMapper = modelMapper;
-	}
+	@Autowired
+	private CategoryRepository categoryRepository;
 
+	@Autowired
+	private ModelMapper modelMapper;
 
 	public CatregoryDTO convertsToDTO(Category category) {
-		//return new CatregoryDTO(category.getUuid(), category.getName(), category.getCreatedBY());
+		// return new CatregoryDTO(category.getUuid(), category.getName(),
+		// category.getCreatedBY());
 		return modelMapper.map(category, CatregoryDTO.class);
 	}
+
 	@Override
 	public CatregoryDTO addCategory(Category category) {
-//		if(category.getName()==null)
-//		{
-//			throw new IllegalArgumentException("please provide name for the category");
-//		}
 		category.setActive(true);
-		 Category savedCategory = categoryRepository.save(category);
-		 return convertsToDTO(savedCategory);
+		Category savedCategory = categoryRepository.save(category);
+		return convertsToDTO(savedCategory);
 	}
 
 //	@Override
@@ -95,7 +88,6 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public Optional<Category> findByUuid(String categoryUuid) {
-		// TODO Auto-generated method stub
 		return categoryRepository.findByUuid(categoryUuid);
 	}
 

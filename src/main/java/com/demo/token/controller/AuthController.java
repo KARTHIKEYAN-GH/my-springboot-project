@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -72,7 +70,7 @@ public class AuthController {
 	 * @return Authorization Token:
 	 */
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody Users request) {
+	public ResponseEntity<?> login( @RequestBody Users request) {
 		try {
 			AuthenticationResponse response = userService.authenticate(request);
 			return ResponseEntity.ok(response);
@@ -83,8 +81,7 @@ public class AuthController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		} catch (Exception e) {
 			// Handle any other unexpected errors
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 	}
 
@@ -96,9 +93,9 @@ public class AuthController {
 	 * @return Saved user entity
 	 */
 	@PutMapping("update/{uuid}")
-	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid, @RequestBody Users request) {
+	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid,@Valid @RequestBody Users request) {
 		try {
-			Users updatedusr=userService.updateUser(uuid, request);
+			Users updatedusr = userService.updateUser(uuid, request);
 			return ResponseEntity.ok(updatedusr);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

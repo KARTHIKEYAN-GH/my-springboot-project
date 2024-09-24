@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -18,79 +17,42 @@ import com.demo.token.dto.TopicsDTO;
 import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.exception.TopicNotFoundException;
 import com.demo.token.model.Category;
-import com.demo.token.model.TopicSummaryView;
 import com.demo.token.model.Topics;
 import com.demo.token.model.TopicsReadStatus;
 import com.demo.token.model.Users;
 import com.demo.token.model.Users.Role;
 import com.demo.token.repo.TopicsRepository;
-import com.demo.token.service.CategoryService;
-import com.demo.token.service.TopicsReadStatusService;
 import com.demo.token.service.TopicsService;
 import com.demo.token.service.UsersService;
+import com.demo.token.serviceutility.UtilService;
 
 @Service
 public class TopicsServiceImpl implements TopicsService {
-	/**
-	 * extracting user information from access token
-	 */
-	@Autowired
-	private final JwtService jwtservice;
 
 	/**
 	 * Repository for performing CRUD operations on Topics. Used to interact with
 	 * the database for managing topics-related data.
 	 */
+	@Autowired
+	private TopicsRepository topicsRepository;
 
-	private final TopicsRepository topicsRepository;
+	@Autowired
+	private UtilService utilService;
 
-	/**
-	 * Service for handling business logic related to categories. Provides methods
-	 * for managing categories that topics belong to.
-	 */
-	private final CategoryService categoryService;
+	@Autowired
+	private UsersService usersService;
 
-	/**
-	 * Service for handling operations related to users. Provides functionality to
-	 * retrieve user information and manage user-related actions.
-	 */
-	private final UsersService usersService;
-
-	/**
-	 * Service for managing read statuses of topics by users. Used to track which
-	 * topics have been read by which users, and to update read timestamps. This
-	 * helps in implementing features like marking topics as read.
-	 */
-	private final TopicsReadStatusService topicsReadStatusService;
-	/**
-	 * Responsible for automating the conversion between different object models,
-	 * Used to map fields from one object to another based on their field names and types.
-	 */
-	private final ModelMapper modelmapper;
-
-	public TopicsServiceImpl(TopicsRepository topicsRepository, JwtService jwtservice, UsersService usersService,
-			CategoryService categoryService, TopicsReadStatusService topicsReadStatusService, ModelMapper modelmapper) {
-		super();
-		this.jwtservice = jwtservice;
-		this.topicsRepository = topicsRepository;
-		this.categoryService = categoryService;
-		this.usersService = usersService;
-		this.topicsReadStatusService = topicsReadStatusService;
-		this.modelmapper = modelmapper;
-	}
-
-	
 	@Override
 	public TopicsDTO convertsToDTO(Topics topics) {
-		//return new TopicsDTO(topics.getUuid(), topics.getName(), topics.getCreatedBy());
-	    modelmapper.typeMap(Topics.class, TopicsDTO.class).addMappings(mapper -> {
-	        mapper.map(Topics::getName, TopicsDTO::setTopic_Name);
-	    });
+		// return new TopicsDTO(topics.getUuid(), topics.getName(),
+		// topics.getCreatedBy());
+		utilService.getModelMapper().typeMap(Topics.class, TopicsDTO.class).addMappings(mapper -> {
+			mapper.map(Topics::getName, TopicsDTO::setTopic_Name);
+		});
 
-	    // Perform the mapping
-	    return modelmapper.map(topics, TopicsDTO.class);
+		// Perform the mapping
+		return utilService.getModelMapper().map(topics, TopicsDTO.class);
 	}
-
 
 	public List<Topics> getTopicsbycategoryUuid(String Uuid) {
 		return topicsRepository.findByCategoryUuid(Uuid);
@@ -101,7 +63,7 @@ public class TopicsServiceImpl implements TopicsService {
 //		if(name==null || description==null) {
 //			throw new IllegalArgumentException("please provide name and description for topic");
 //		}
-		Optional<Category> category = categoryService.findByUuid(categoryUuid);
+		Optional<Category> category = utilService.getCategoryService().findByUuid(categoryUuid);
 		if (category.isPresent()) {
 			Category categories = category.get();
 			Topics topics = new Topics();
@@ -109,7 +71,7 @@ public class TopicsServiceImpl implements TopicsService {
 			topics.setDescription(description);
 			topics.setCategory(categories);
 			topics.setActive(true);
-			Topics savedtopics= topicsRepository.save(topics);
+			Topics savedtopics = topicsRepository.save(topics);
 			return convertsToDTO(savedtopics);
 		} else {
 			throw new IllegalArgumentException("Category not found with UUID: " + categoryUuid);
@@ -171,7 +133,7 @@ public class TopicsServiceImpl implements TopicsService {
 
 		if (description.isPresent()) {
 			// Extract the username from the JWT token
-			String username = jwtservice.extractUserName(token);
+			String username = utilService.getJwtService().extractUserName(token);
 
 			// Find the user by username, throw an exception if not found
 			Users users = usersService.findByUserName(username)
@@ -184,14 +146,14 @@ public class TopicsServiceImpl implements TopicsService {
 			// Check if the role of the user is ATTENDEE
 			if (users.getRole().equals(Role.ATTENDEE)) {
 				// Check if there's an existing read status for this user and topic
-				Optional<TopicsReadStatus> existingReadStatus = topicsReadStatusService
+				Optional<TopicsReadStatus> existingReadStatus = utilService.getTopicsReadStatusService()
 						.getReadStatusByTopicsUuidAndUserUuid(topicsUuid, users.getUuid());
 
 				if (existingReadStatus.isPresent()) {
 					// Update the existing read status with the new read time
 					TopicsReadStatus readStatus = existingReadStatus.get();
 					readStatus.setReadAt(LocalDateTime.now());
-					topicsReadStatusService.saveStatus(readStatus); // Save the updated read status
+					utilService.getTopicsReadStatusService().saveStatus(readStatus); // Save the updated read status
 				} else {
 					// Create a new read status
 					TopicsReadStatus readStatus = new TopicsReadStatus();
@@ -203,7 +165,7 @@ public class TopicsServiceImpl implements TopicsService {
 					readStatus.setReadAt(LocalDateTime.now()); // Set the current timestamp
 					readStatus.setUsers(users);
 					readStatus.setVersion(readStatus.getVersion() + 1);
-					topicsReadStatusService.saveStatus(readStatus); // Save the new read status
+					utilService.getTopicsReadStatusService().saveStatus(readStatus); // Save the new read status
 				}
 			}
 

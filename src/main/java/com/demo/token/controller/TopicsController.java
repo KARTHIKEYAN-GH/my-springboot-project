@@ -104,7 +104,7 @@ public class TopicsController {
 	 */
 	@PutMapping("/updateTopic/{topicsUuid}")
 	public ResponseEntity<?> updateTopic(@PathVariable("topicsUuid") String topicsUuid,
-			@RequestBody Topics updateRequest) {
+			@Valid @RequestBody Topics updateRequest) {
 		try {
 			Optional<String> updatedTopic = topicsService.updateTopics(topicsUuid, updateRequest);
 			return ResponseEntity.ok("Updated Sucessfully " + updatedTopic);
