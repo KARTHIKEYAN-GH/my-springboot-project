@@ -18,6 +18,8 @@ import com.demo.token.dto.CatregoryDTO;
 import com.demo.token.model.Category;
 import com.demo.token.service.CategoryService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
@@ -42,7 +44,7 @@ public class CategoryController {
 	 * @return category name
 	 */
 	@PostMapping("/addCategories")
-	public ResponseEntity<?> addCategory(@RequestBody Category category) {
+	public ResponseEntity<?> addCategory(@Valid @RequestBody Category category) {
 		try {
 			CatregoryDTO newcategories = categoryService.addCategory(category);
 			return ResponseEntity.ok(newcategories);

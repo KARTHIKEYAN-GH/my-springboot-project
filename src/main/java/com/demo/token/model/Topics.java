@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,11 +47,13 @@ public class Topics {
 	/**
 	 * Topic's Name
 	 */
+	@NotNull(message = "Topic's name cannot be null")
 	private String name;
 
 	/**
 	 * Topic's Description
 	 */
+	@NotNull(message = "Description cannot be null")
 	@Column(name = "description", columnDefinition = "TEXT")
 	private String description;
 

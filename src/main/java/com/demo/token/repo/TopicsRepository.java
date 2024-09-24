@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import com.demo.token.dto.TopicCategoryProjection;
 import com.demo.token.model.Category;
+import com.demo.token.model.TopicSummaryView;
 import com.demo.token.model.Topics;
 
 @Repository
@@ -83,4 +84,9 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	 */
 	List<Topics> findByIsActiveTrue();
 	
-}
+	
+	//@Query("SELECT t FROM TopicSummaryView t")
+	//@Query(value = "SELECT * FROM topic_summary_view", nativeQuery = true)
+	//List<TopicSummaryView> getAlltopics();
+
+	}

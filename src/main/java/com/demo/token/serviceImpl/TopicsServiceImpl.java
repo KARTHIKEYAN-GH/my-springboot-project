@@ -18,6 +18,7 @@ import com.demo.token.dto.TopicsDTO;
 import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.exception.TopicNotFoundException;
 import com.demo.token.model.Category;
+import com.demo.token.model.TopicSummaryView;
 import com.demo.token.model.Topics;
 import com.demo.token.model.TopicsReadStatus;
 import com.demo.token.model.Users;
@@ -97,10 +98,9 @@ public class TopicsServiceImpl implements TopicsService {
 	}
 
 	public TopicsDTO addTopics(String categoryUuid, String name, String description) {
-		if(name==null ||description==null)
-		{
-			throw new IllegalArgumentException("please provide name and description for topic");
-		}
+//		if(name==null || description==null) {
+//			throw new IllegalArgumentException("please provide name and description for topic");
+//		}
 		Optional<Category> category = categoryService.findByUuid(categoryUuid);
 		if (category.isPresent()) {
 			Category categories = category.get();
@@ -110,7 +110,7 @@ public class TopicsServiceImpl implements TopicsService {
 			topics.setCategory(categories);
 			topics.setActive(true);
 			Topics savedtopics= topicsRepository.save(topics);
-			 return convertsToDTO(savedtopics);
+			return convertsToDTO(savedtopics);
 		} else {
 			throw new IllegalArgumentException("Category not found with UUID: " + categoryUuid);
 		}

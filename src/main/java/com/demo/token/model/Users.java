@@ -18,6 +18,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -44,28 +45,33 @@ public class Users {
 	/**
 	 * Name of the user
 	 */
+	@NotNull(message = "Name cannot be null")
 	private String name;
 
 	/**
 	 * email for communication
 	 */
+	@NotNull(message = "Email cannot be null")
 	private String email;
 
 	/**
 	 * unique phoneNumber for each user
 	 */
+	@NotNull(message = "phoneNumber cannot be null")
 	@Column(name="phone_number",nullable = false)
 	private String phoneNumber;
 
 	/**
 	 * Unique userName for login
 	 */
+	@NotNull(message = "userName cannot be null")
 	@Column(name="user_name",nullable = false)
 	private String userName;
 
 	/**
 	 * password for login
 	 */
+	@NotNull(message = "password cannot be null")
 	private String password;
 
 	/**
@@ -103,6 +109,7 @@ public class Users {
 	 * Stores the user's role.
 	 * Saved as a ENUM (e.g., "ADMIN") in the database.
 	 */
+	@NotNull(message = "Role cannot be null")
 	@Enumerated(EnumType.STRING)
 	private Role role;
 

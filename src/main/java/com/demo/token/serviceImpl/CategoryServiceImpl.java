@@ -35,12 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 	@Override
 	public CatregoryDTO addCategory(Category category) {
-		if(category.getName()==null)
-		{
-			throw new IllegalArgumentException("please provide name for the category");
-		}
+//		if(category.getName()==null)
+//		{
+//			throw new IllegalArgumentException("please provide name for the category");
+//		}
 		category.setActive(true);
-		 //categoryRepository.save(category);
 		 Category savedCategory = categoryRepository.save(category);
 		 return convertsToDTO(savedCategory);
 	}

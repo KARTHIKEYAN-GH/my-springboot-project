@@ -22,6 +22,8 @@ import com.demo.token.exception.ResourceNotFoundException;
 import com.demo.token.model.Topics;
 import com.demo.token.service.TopicsService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/topics")
 public class TopicsController {
@@ -40,7 +42,6 @@ public class TopicsController {
 		super();
 		this.topicsService = topicsService;
 	}
-
 	/**
 	 * To add new Topics based on category uuid
 	 * 
@@ -49,7 +50,7 @@ public class TopicsController {
 	 * @return saved topic's name with message
 	 */
 	@PostMapping("/addtopics/{categoryUuid}")
-	public ResponseEntity<?> addTopic(@PathVariable String categoryUuid, @RequestBody Topics topicRequest) {
+	public ResponseEntity<?> addTopic( @PathVariable String categoryUuid,@Valid @RequestBody Topics topicRequest) {
 		try {
 			TopicsDTO topic = topicsService.addTopics(categoryUuid, topicRequest.getName(), topicRequest.getDescription());
 			return ResponseEntity.ok(topic);
@@ -139,7 +140,6 @@ public class TopicsController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("description not found with UUID: "+topicsUuid);
 		}
 	}
-
 	/**
 	 * 
 	 * @param topicsUuid
@@ -155,7 +155,6 @@ public class TopicsController {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Topics not found with uuid");
 			}
 		} catch (Exception e) {
-
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 					.body("An error occurred while deleting the category");
 		}

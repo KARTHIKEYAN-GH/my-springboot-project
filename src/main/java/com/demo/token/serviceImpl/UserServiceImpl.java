@@ -10,6 +10,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -91,10 +94,10 @@ public class UserServiceImpl implements UsersService {
 	@Override
 	@Transactional
 	public UsersDTO createUser(Users users) {
-		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
-				|| users.getEmail() == null) {
-			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
-		}
+//		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
+//				|| users.getEmail() == null) {
+//			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
+//		}
 		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format.");
 		}
@@ -129,6 +132,7 @@ public class UserServiceImpl implements UsersService {
 	}
 
 	@Override
+
 	public AuthenticationResponse authenticate(Users request) {
 		if (request.getUserName() == null && request.getPassword() == null) {
 			throw new IllegalArgumentException("UserName and Password should not be Empty");
@@ -136,21 +140,31 @@ public class UserServiceImpl implements UsersService {
 		if (request.getUserName() == null || request.getPassword() == null) {
 			throw new IllegalArgumentException("Missing  userName or Password");
 		}
-		authenticationManager
-			.authenticate(new UsernamePasswordAuthenticationToken(request.getUserName(), request.getPassword()));
-		
-		Users users = userRepository.findByuserName(request.getUserName())
-				.orElseThrow(() -> new UsernameNotFoundException("No user found given user name"));
-		if(!passwordEncoder.matches(request.getPassword(), users.getPassword()))
-		{
-			throw new BadCredentialsException("Invalid password ");
+		try {
+			UsernamePasswordAuthenticationToken tokenn = new UsernamePasswordAuthenticationToken(request.getUserName(),
+					request.getPassword());
+			// Before authentication 
+			System.out.println("Token before authentication: " + tokenn);
+			
+			Authentication authenticatedToken = authenticationManager.authenticate(tokenn);
+			//  after authentication
+			System.out.println("Token after authentication: " + authenticatedToken);
+			
+			UserDetails userDetails = (UserDetails) authenticatedToken.getPrincipal();
+			Optional<Users> users = userRepository.findByuserName(userDetails.getUsername());
+			if (users.isPresent() && users.get().getIsActive())
+			{
+				String token = jwtService.generateToken(userDetails);
+				return new AuthenticationResponse(token);
+			}
+			else
+			{
+				throw new IllegalStateException("User is inactive. Please contact Admin.");
+			}
 		}
-		if (users.getIsActive()) {
-			String token = jwtService.generateToken(users);
-			return new AuthenticationResponse(token);
-		} else {
-
-			throw new IllegalStateException("User is inactive. Please contact Admin.");
+		catch (AuthenticationException e)
+		{
+			throw new BadCredentialsException(e.getMessage());
 		}
 	}
 

@@ -76,22 +76,15 @@ public class AuthController {
 		try {
 			AuthenticationResponse response = userService.authenticate(request);
 			return ResponseEntity.ok(response);
-		} catch (UsernameNotFoundException e) {
-			// Handle case where the userName does not exist
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-		} catch (BadCredentialsException e) {
-			// Handle case where the credentials are invalid
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
 		} catch (IllegalStateException e) {
 			// Handle case where the user is inactive
 			return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-
 		} catch (Exception e) {
 			// Handle any other unexpected errors
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body("An error occurred during authentication.");
+					.body(e.getMessage());
 		}
 	}
 
@@ -105,8 +98,8 @@ public class AuthController {
 	@PutMapping("update/{uuid}")
 	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid, @RequestBody Users request) {
 		try {
-			userService.updateUser(uuid, request);
-			return ResponseEntity.ok("User updated successfully");
+			Users updatedusr=userService.updateUser(uuid, request);
+			return ResponseEntity.ok(updatedusr);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		} catch (ResourceNotFoundException e) {

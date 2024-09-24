@@ -45,9 +45,9 @@ public class JwtService {
 		return Jwts.parser().verifyWith(getSigninKey()).build().parseSignedClaims(token).getPayload();
 	}
 
-	public String generateToken(Users users) {
+	public String generateToken(UserDetails userDetails) {
 
-		String token = Jwts.builder().subject(users.getUserName()).claim("role", users.getRole().name())
+		String token = Jwts.builder().subject(userDetails.getUsername()).claim("role", userDetails.getAuthorities().toString())
 				.issuedAt(new Date(System.currentTimeMillis()))
 				.expiration(new Date(System.currentTimeMillis() + 12 * 60 * 60 * 1000))
 				// .signWith(getSigninKey(),SignatureAlgorithm.HS384)
