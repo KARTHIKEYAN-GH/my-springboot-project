@@ -15,12 +15,22 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class MailServiceImpl implements MailService {
+
+	/**
+	 * JavaMailSender is used to send emails from the application. It provides
+	 * methods to configure and send email messages using SMTP (Simple Mail Transfer
+	 * Protocol).
+	 */
 	@Autowired
-	private  JavaMailSender javaMailSender;
-	
+	private JavaMailSender javaMailSender;
+	/**
+	 * TemplateEngine is used for processing email templates. 
+	 * It enables the application to generate dynamic email content 
+	 * by merging templates with data before sending emails.
+	 */
 	@Autowired
 	private TemplateEngine templateEngine;
-	
+
 	@Override
 	public void sendEmail(String to, String name, String email, String phoneNumber, String userName, String password,
 			Role role) {
@@ -34,26 +44,26 @@ public class MailServiceImpl implements MailService {
 			// Create the email body with user details and a custom message
 			Context context = new Context();
 			context.setVariable("name", name);
-            context.setVariable("email", email);
-            context.setVariable("phoneNumber", phoneNumber);
-            context.setVariable("userName", userName);
-            context.setVariable("password", password);
-            context.setVariable("role", role);
+			context.setVariable("email", email);
+			context.setVariable("phoneNumber", phoneNumber);
+			context.setVariable("userName", userName);
+			context.setVariable("password", password);
+			context.setVariable("role", role);
 
-            // Process the HTML template with Thymeleaf
-            String htmlContent = templateEngine.process("registrationEmail", context);
+			// Process the HTML template with Thymeleaf
+			String htmlContent = templateEngine.process("registrationEmail", context);
 
-            // Set the HTML content in the email body
-            helper.setText(htmlContent, true);  // true to indicate that it is HTML
+			// Set the HTML content in the email body
+			helper.setText(htmlContent, true); // true to indicate that it is HTML
 
-            // Send the email
-            javaMailSender.send(message);
-            System.out.println("Registration email sent successfully!");
+			// Send the email
+			javaMailSender.send(message);
+			System.out.println("Registration email sent successfully!");
 
-        } catch (MessagingException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Error while sending email: " + e.getMessage());
-        }
-    }
+		} catch (MessagingException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Error while sending email: " + e.getMessage());
+		}
+	}
 
 }

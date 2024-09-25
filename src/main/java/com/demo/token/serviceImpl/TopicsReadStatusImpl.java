@@ -2,6 +2,7 @@ package com.demo.token.serviceImpl;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.demo.token.model.TopicsReadStatus;
@@ -10,13 +11,15 @@ import com.demo.token.service.TopicsReadStatusService;
 
 @Service
 public class TopicsReadStatusImpl implements TopicsReadStatusService {
-
-	private final TopicReadStatusRepository topicReadStatusRepository;
-
-	public TopicsReadStatusImpl(TopicReadStatusRepository topicReadStatusRepository) {
-		super();
-		this.topicReadStatusRepository = topicReadStatusRepository;
-	}
+	
+	/**
+	 * TopicReadStatusRepository is a Spring Data JPA repository interface 
+	 * for managing TopicReadStatus entities in the database. 
+	 * It provides methods for performing CRUD operations related to 
+	 * tracking the read status of topics by users.
+	 */
+	@Autowired
+	private TopicReadStatusRepository topicReadStatusRepository;
 
 	@Override
 	public TopicsReadStatus saveStatus(TopicsReadStatus topicsReadStatus) {
@@ -25,19 +28,11 @@ public class TopicsReadStatusImpl implements TopicsReadStatusService {
 
 	@Override
 	public Optional<TopicsReadStatus> getReadStatusByUsersUuid(String usersUuid) {
-		// TODO Auto-generated method stub
 		return topicReadStatusRepository.findByUsersUuid(usersUuid);
 	}
-
-//	@Override
-//	public Optional<TopicsReadStatus> getReadStatusByTopicsUuid(String topicsUuid) {
-//		// TODO Auto-generated method stub
-//		return topicReadStatusRepository.findByTopicsUuid(topicsUuid);
-//	}
-
+	
 	@Override
 	public Optional<TopicsReadStatus> getReadStatusByTopicsUuidAndUserUuid(String topicsUuid, String usersUuid) {
-		// TODO Auto-generated method stub
 		return topicReadStatusRepository.findByTopicsUuidAndUsersUuid(topicsUuid, usersUuid);
 	}
 

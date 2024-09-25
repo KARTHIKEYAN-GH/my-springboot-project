@@ -3,6 +3,7 @@ package com.demo.token.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,14 +29,12 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/topics")
 public class TopicsController {
 
-	/**
-	 * Service layer dependency for business logic related to Topics Constructor to
-	 * inject the TopicsService dependency.
-	 * 
+	/** 
 	 * @param topicsService The service that handles the business logic for topics.
 	 *                      Dependency Injection is used here to ensure the
 	 *                      controller can access the service methods.
 	 */
+	@Autowired
 	private final TopicsService topicsService;
 
 	public TopicsController(TopicsService topicsService) {

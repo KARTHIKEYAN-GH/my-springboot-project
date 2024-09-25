@@ -3,6 +3,7 @@ package com.demo.token.controller;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,19 +30,12 @@ import jakarta.validation.Valid;
 public class AuthController {
 
 	/**
-	 * Service layer dependency for business logic related to User entity
-	 * Constructor to inject the UsersService dependency.
-	 * 
 	 * @param userService The service that handles the business logic for users.
 	 *                    Dependency Injection is used here to ensure the controller
 	 *                    can access the service methods.
 	 */
-	private final UsersService userService;
-
-	public AuthController(UsersService usersService) {
-		super();
-		this.userService = usersService;
-	}
+	@Autowired
+	private UsersService userService;
 
 	/**
 	 * To create a new user.
@@ -70,7 +64,7 @@ public class AuthController {
 	 * @return Authorization Token:
 	 */
 	@PostMapping("/login")
-	public ResponseEntity<?> login( @RequestBody Users request) {
+	public ResponseEntity<?> login(@RequestBody Users request) {
 		try {
 			AuthenticationResponse response = userService.authenticate(request);
 			return ResponseEntity.ok(response);
@@ -93,7 +87,7 @@ public class AuthController {
 	 * @return Saved user entity
 	 */
 	@PutMapping("update/{uuid}")
-	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid,@Valid @RequestBody Users request) {
+	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid, @Valid @RequestBody Users request) {
 		try {
 			Users updatedusr = userService.updateUser(uuid, request);
 			return ResponseEntity.ok(updatedusr);

@@ -3,6 +3,7 @@ package com.demo.token.controller;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,18 +25,13 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/categories")
 public class CategoryController {
 	
-	/**Service layer dependency for business logic related to Categories
-	 * Constructor to inject the CategoryService dependency.
-	 * 
+	/**
 	 * @param categoryService The service that handles the business logic for
 	 *                        category. Dependency Injection is used here to ensure
 	 *                        the controller can access the service methods.
 	 */
-	private final CategoryService categoryService;
-
-	CategoryController(CategoryService categoryService) {
-		this.categoryService = categoryService;
-	}
+	@Autowired
+	private CategoryService categoryService;
 
 	/**
 	 * To create new category

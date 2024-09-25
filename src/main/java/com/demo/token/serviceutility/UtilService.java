@@ -9,6 +9,7 @@ import com.demo.token.service.CategoryService;
 import com.demo.token.service.MailService;
 import com.demo.token.service.TopicsReadStatusService;
 import com.demo.token.serviceImpl.JwtService;
+import com.demo.token.validation.ValidPath;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -11,17 +11,17 @@ import com.demo.token.service.TopicsViewService;
 
 @Service
 public class TopicsViewServiceImpl implements TopicsViewService {
-@Autowired
-private TopicViewRepository topicViewRepository;
+	/**
+	 * for managing TopicView entities in the database. 
+	 * and helps track user interactions with topics.
+	 */
+	@Autowired
+	private TopicViewRepository topicViewRepository;
 
-//@Autowired
-//private TopicsRepository topicsRepository;
 	@Override
 	public List<TopicSummaryView> getAllTopics() {
-		//return  topicsRepository.getAlltopics();
-		//return  topicViewRepository.findAll();
+		// return topicsRepository.getAlltopics();
+		// return topicViewRepository.findAll();
 		return topicViewRepository.getAlltopics();
 	}
 }
-        
-	

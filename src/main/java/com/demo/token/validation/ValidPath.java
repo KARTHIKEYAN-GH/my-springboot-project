@@ -16,7 +16,8 @@ public class ValidPath {
 	public ValidPath() {
 		validPath = new HashSet<>();
 
-		// Add all valid paths to the set
+		// Add all Admin related paths to the set
+		
 		validPath.add("/api/user/login");
 		validPath.add("/api/user/register");
 		validPath.add("/api/user/delete/{Uuid}");

@@ -36,6 +36,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	@Autowired
 	private UserDetailsServiceImp userDetailsService;
 
+	/**
+	 * ValidPath is a utility or service that verifies and validates the request
+	 * paths or endpoints to ensure if users entered correct path
+	 */
 	@Autowired
 	private ValidPath validPath;
 
@@ -112,7 +116,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		response.setContentType("application/json"); // Set the response content type to JSON
 		PrintWriter out = response.getWriter();
-		 out.write("{\"error\": \"" + message + "\", \"details\": \"Bad request or unauthorized access\"}"); 
-		 out.flush();
+		out.write("{\"error\": \"" + message + "\", \"details\": \"Bad request or unauthorized access\"}");
+		out.flush();
 	}
 }

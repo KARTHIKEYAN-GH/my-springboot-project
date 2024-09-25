@@ -30,17 +30,28 @@ import com.demo.token.serviceutility.UtilService;
 public class TopicsServiceImpl implements TopicsService {
 
 	/**
+	 * UtilService is a service class that provides various utility methods that can
+	 * be utilized by different components, promoting code * reusability and
+	 * separation of concerns.
+	 */
+	@Autowired
+	private UtilService utilService;
+
+	/**
+	 * UsersService is responsible for managing user-related operations This service
+	 * interacts with the user repository and also handle business logic related to
+	 * user management, ensuring that user data is correctly processed and
+	 * maintained.
+	 */
+	@Autowired
+	private UsersService usersService;
+
+	/**
 	 * Repository for performing CRUD operations on Topics. Used to interact with
 	 * the database for managing topics-related data.
 	 */
 	@Autowired
 	private TopicsRepository topicsRepository;
-
-	@Autowired
-	private UtilService utilService;
-
-	@Autowired
-	private UsersService usersService;
 
 	@Override
 	public TopicsDTO convertsToDTO(Topics topics) {
@@ -49,14 +60,11 @@ public class TopicsServiceImpl implements TopicsService {
 		utilService.getModelMapper().typeMap(Topics.class, TopicsDTO.class).addMappings(mapper -> {
 			mapper.map(Topics::getName, TopicsDTO::setTopic_Name);
 		});
-
-		// Perform the mapping
 		return utilService.getModelMapper().map(topics, TopicsDTO.class);
 	}
 
 	public List<Topics> getTopicsbycategoryUuid(String Uuid) {
 		return topicsRepository.findByCategoryUuid(Uuid);
-
 	}
 
 	public TopicsDTO addTopics(String categoryUuid, String name, String description) {
@@ -104,21 +112,20 @@ public class TopicsServiceImpl implements TopicsService {
 
 	@Override
 	public Optional<String> updateTopics(String topicsUuid, Topics request) {
-	    Optional<Topics> existingTopic = topicsRepository.findByUuid(topicsUuid);
+		Optional<Topics> existingTopic = topicsRepository.findByUuid(topicsUuid);
 
-	    if (existingTopic.isPresent()) {
-	        Topics existingTopicname = existingTopic.get();
-	        existingTopicname.setName(request.getName());
-	        existingTopicname.setDescription(request.getDescription());
+		if (existingTopic.isPresent()) {
+			Topics existingTopicname = existingTopic.get();
+			existingTopicname.setName(request.getName());
+			existingTopicname.setDescription(request.getDescription());
 
-	        // Save the updated topic
-	        topicsRepository.save(existingTopicname);
-	        return Optional.of(existingTopicname.getName());
-	    } else {
-	        throw new ResourceNotFoundException("Topic not found with UUID " + topicsUuid);
-	    }
+			// Save the updated topic
+			topicsRepository.save(existingTopicname);
+			return Optional.of(existingTopicname.getName());
+		} else {
+			throw new ResourceNotFoundException("Topic not found with UUID " + topicsUuid);
+		}
 	}
-
 
 	public DescriptionDTO convertsDescriptionToDTO(String description) {
 		return new DescriptionDTO(description);

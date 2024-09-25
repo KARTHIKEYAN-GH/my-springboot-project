@@ -34,6 +34,11 @@ public class UserServiceImpl implements UsersService {
 	@Autowired
 	private UserRepository userRepository;
 
+	/**
+	 * UtilService is a service class that provides various utility methods that can
+	 * be utilized by different components, promoting code * reusability and
+	 * separation of concerns.
+	 */
 	@Autowired
 	private UtilService utilService;
 
@@ -86,12 +91,6 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	public AuthenticationResponse authenticate(Users request) {
-//		if (request.getUserName() == null && request.getPassword() == null) {
-//			throw new IllegalArgumentException("UserName and Password should not be Empty");
-//		}
-//		if (request.getUserName() == null || request.getPassword() == null) {
-//			throw new IllegalArgumentException("Missing  userName or Password");
-//		}
 		try {
 			UsernamePasswordAuthenticationToken tokenn = new UsernamePasswordAuthenticationToken(request.getUserName(),
 					request.getPassword());
@@ -121,11 +120,6 @@ public class UserServiceImpl implements UsersService {
 
 		Users user = userRepository.findByUuid(uuid)
 				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
-
-//		if (users.getUserName() == null || users.getPassword() == null || users.getRole() == null
-//				|| users.getEmail() == null) {
-//			throw new IllegalArgumentException("Username, password, email, and role must be provided.");
-//		}
 
 		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format");

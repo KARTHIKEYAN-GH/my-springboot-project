@@ -13,7 +13,6 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 	/**
 	 * To find a category by its uuid
-	 * 
 	 * @param uuid
 	 * @return category details
 	 */
@@ -21,12 +20,14 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
 	/**
 	 * To check a whether category present or not
-	 * 
 	 * @param uuid
 	 * @return true or false
 	 */
 	boolean existsByUuid(String uuid);
 
+	/**
+	 * @return list of IsaActive(True) users
+	 */
 	List<Category> findByIsActiveTrue();
 
 }

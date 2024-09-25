@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import com.demo.token.dto.TopicCategoryProjection;
 import com.demo.token.model.Category;
-import com.demo.token.model.TopicSummaryView;
 import com.demo.token.model.Topics;
 
 @Repository
