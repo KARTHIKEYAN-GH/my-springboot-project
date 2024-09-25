@@ -60,9 +60,6 @@ public class TopicsServiceImpl implements TopicsService {
 	}
 
 	public TopicsDTO addTopics(String categoryUuid, String name, String description) {
-//		if(name==null || description==null) {
-//			throw new IllegalArgumentException("please provide name and description for topic");
-//		}
 		Optional<Category> category = utilService.getCategoryService().findByUuid(categoryUuid);
 		if (category.isPresent()) {
 			Category categories = category.get();
@@ -106,18 +103,22 @@ public class TopicsServiceImpl implements TopicsService {
 	}
 
 	@Override
-	public Optional<String> updateTopics(String topicsUuid, Topics topics) {
-		Optional<Topics> existingTopic = topicsRepository.findByUuid(topicsUuid);
+	public Optional<String> updateTopics(String topicsUuid, Topics request) {
+	    Optional<Topics> existingTopic = topicsRepository.findByUuid(topicsUuid);
 
-		if (existingTopic.isPresent()) {
-			Topics existingTopicname = existingTopic.get();
-			existingTopicname.setName(topics.getName());
-			topicsRepository.save(existingTopicname);
-			return Optional.of(existingTopicname.getName());
-		} else {
-			throw new ResourceNotFoundException("Topic not found with UUID " + topicsUuid);
-		}
+	    if (existingTopic.isPresent()) {
+	        Topics existingTopicname = existingTopic.get();
+	        existingTopicname.setName(request.getName());
+	        existingTopicname.setDescription(request.getDescription());
+
+	        // Save the updated topic
+	        topicsRepository.save(existingTopicname);
+	        return Optional.of(existingTopicname.getName());
+	    } else {
+	        throw new ResourceNotFoundException("Topic not found with UUID " + topicsUuid);
+	    }
 	}
+
 
 	public DescriptionDTO convertsDescriptionToDTO(String description) {
 		return new DescriptionDTO(description);
