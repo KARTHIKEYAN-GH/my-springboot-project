@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.demo.token.dto.CategoryWithTopicsDto;
 import com.demo.token.dto.DescriptionDTO;
 import com.demo.token.dto.TopicsDTO;
-import com.demo.token.model.TopicSummaryView;
 import com.demo.token.model.Topics;
 
 public interface TopicsService {
