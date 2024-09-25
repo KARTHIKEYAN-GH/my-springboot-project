@@ -61,6 +61,9 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	 * @return topics details
 	 */
 	Optional<Topics> findByCategory(Category category);
+	
+	
+	//Optional<Topics>findByCategoryUuid(String categoryUuid);
 
 	/**
 	 * To find a topics under category
