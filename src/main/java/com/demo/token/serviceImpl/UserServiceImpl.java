@@ -107,7 +107,7 @@ public class UserServiceImpl implements UsersService {
 				String token = utilService.getJwtService().generateToken(userDetails);
 				return new AuthenticationResponse(token);
 			} else {
-				throw new IllegalStateException("User is inactive. Please contact Admin.");
+				throw new IllegalStateException("User has been inactive. Please contact the Admin.");
 			}
 		} catch (AuthenticationException e) {
 			throw new BadCredentialsException(e.getMessage());
@@ -116,48 +116,46 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	@Transactional
-	public Users updateUser(String uuid, Users users) {
+	public Users updateUser(String uuid, Users request) {
 
-		Users user = userRepository.findByUuid(uuid)
-				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
+	    Users user = userRepository.findByUuid(uuid)
+	            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
 
-		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
-			throw new IllegalArgumentException("Invalid phone number format");
-		}
+	    if (!PhoneNumberValidation.isValid(request.getPhoneNumber())) {
+	        throw new IllegalArgumentException("Invalid phone number format");
+	    }
 
-		if (!users.getEmail().contains("@gmail.com") || !users.getEmail().endsWith(".com")) {
-			throw new IllegalArgumentException("Invalid email, Please check your email.");
-		}
-		Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(users.getPhoneNumber(), true);
-		if (existingPhone.isPresent() && !existingPhone.get().getUuid().equals(uuid)) {
-			throw new IllegalArgumentException("Phone number is already in use by another account.");
-		}
-		Optional<Users> existingUserName = userRepository.findByUserName(users.getUserName());
-		if (existingUserName.isPresent() && !existingUserName.get().getUuid().equals(uuid)) {
-			throw new IllegalArgumentException("A user with this userName already exist");
-		}
+	    if (!request.getEmail().contains("@gmail.com") || !request.getEmail().endsWith(".com")) {
+	        throw new IllegalArgumentException("Invalid email, Please check your email.");
+	    }
 
-		if (user.getRole().equals(Role.ADMIN)) {
-			user.setName(users.getName());
-			user.setEmail(users.getEmail());
-			user.setPhoneNumber(users.getPhoneNumber());
-			user.setUserName(users.getUserName());
-			user.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
-			user.setRole(users.getRole());
-			user.setIsActive(true);
-		} else {
-			user.setName(users.getName());
-			user.setEmail(users.getEmail());
-			user.setPhoneNumber(users.getPhoneNumber());
-			user.setUserName(users.getUserName());
-			user.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
-			if (users.getRole().equals(Role.ADMIN)) {
-				throw new IllegalStateException("Invalid Role");
-			}
-			user.setRole(users.getRole());
-			user.setIsActive(true);
-		}
-		return userRepository.save(user);
+	    Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(request.getPhoneNumber(), true);
+	    if (existingPhone.isPresent() && !existingPhone.get().getUuid().equals(uuid)) {
+	        throw new IllegalArgumentException("Phone number is already in use by another account.");
+	    }
+
+	    Optional<Users> existingUserName = userRepository.findByUserName(request.getUserName());
+	    if (existingUserName.isPresent() && !existingUserName.get().getUuid().equals(uuid)) {
+	        throw new IllegalArgumentException("A user with this userName already exists.");
+	    }
+
+	    // Common fields update
+	    user.setName(request.getName());
+	    user.setEmail(request.getEmail());
+	    user.setPhoneNumber(request.getPhoneNumber());
+	    user.setUserName(request.getUserName());
+	    user.setPassword(utilService.getPasswordEncoder().encode(request.getPassword()));
+
+	    // Handle Role change
+	    // Allow ADMIN to be changed to TRAINEE or ATTENDEE
+	    if (!user.getRole().equals(Role.ADMIN) && request.getRole().equals(Role.ADMIN)) {
+	        throw new IllegalStateException("Invalid Role");
+	    }
+	    // Update role
+	    user.setRole(request.getRole());
+	    user.setIsActive(true);
+
+	    return userRepository.save(user);
 	}
 
 	@Override

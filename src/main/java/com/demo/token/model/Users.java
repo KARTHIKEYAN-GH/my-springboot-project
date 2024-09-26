@@ -107,9 +107,9 @@ public class Users {
 	}
 	/**
 	 * Stores the user's role.
-	 * Saved as a ENUM (e.g., "ADMIN") in the database.
+	 * Saved as a ENUM (e.g., "ADMIN","TRAINEE",) in the database.
 	 */
-	@NotNull(message = "Role cannot be null")
+	@NotNull(message = "Role cannot be null(TRAINEE or ATTENDEE)")
 	@Enumerated(EnumType.STRING)
 	private Role role;
 

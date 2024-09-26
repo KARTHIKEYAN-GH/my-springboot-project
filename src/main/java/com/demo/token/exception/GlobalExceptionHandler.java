@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
 
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public String handle404(NoHandlerFoundException ex) {
-		return "The requested path was not found"; // Customize this message as needed
+		return "The requested path was not found"; 
 	}
 	@ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {

@@ -116,6 +116,7 @@ public class TopicsServiceImpl implements TopicsService {
 
 		if (existingTopic.isPresent()) {
 			Topics existingTopicname = existingTopic.get();
+			//existingTopicname.setCategory(request.getCategory());
 			existingTopicname.setName(request.getName());
 			existingTopicname.setDescription(request.getDescription());
 

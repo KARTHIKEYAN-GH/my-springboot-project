@@ -67,7 +67,7 @@ public class Topics {
 	 * Topics belongs to category's uuid
 	 */
 	@ManyToOne
-	@JoinColumn(name = "category_uuid", referencedColumnName = "uuid", updatable = false,nullable = false)
+	@JoinColumn(name = "category_uuid", referencedColumnName = "uuid", updatable = true ,nullable = false)
 	private Category category;
 
 	/**
