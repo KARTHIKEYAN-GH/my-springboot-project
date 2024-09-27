@@ -22,13 +22,13 @@ public interface UsersService {
 	 * @param request(userName,password)
 	 * @return AuthenticationResponse as token
 	 */
-	AuthenticationResponse authenticate(Users request);
+	AuthenticationResponse authenticate(String userName, String password);
 
 	/**
 	 * To update existing user
 	 * 
 	 * @param User's Uuid
-	 * @param users user_details
+	 * @param users  user_details
 	 * @return updated user
 	 */
 	Users updateUser(String Uuid, Users users);
@@ -92,10 +92,13 @@ public interface UsersService {
 	 * @return User details
 	 */
 	Optional<Users> findByUserName(String username);
+
 	/**
 	 * To find all user by given name
+	 * 
 	 * @param name
 	 * @return List of users
 	 */
 	List<UsersDTO> findAllByNameContaining(String name);
+
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.demo.token.dto.AuthenticationResponse;
+import com.demo.token.dto.LoginRequest;
 import com.demo.token.dto.UsersDTO;
 import com.demo.token.exception.NoUsersFoundException;
 import com.demo.token.exception.ResourceNotFoundException;
@@ -36,7 +37,7 @@ public class AuthController {
 	 */
 	@Autowired
 	private UsersService userService;
-
+	
 	/**
 	 * To create a new user.
 	 * 
@@ -64,9 +65,9 @@ public class AuthController {
 	 * @return Authorization Token:
 	 */
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody Users request) {
+	public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
 		try {
-			AuthenticationResponse response = userService.authenticate(request);
+			AuthenticationResponse response = userService.authenticate(request.getUserName(),request.getPassword());
 			return ResponseEntity.ok(response);
 		} catch (IllegalStateException e) {
 			// Handle case where the user is inactive

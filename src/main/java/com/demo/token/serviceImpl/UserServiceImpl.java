@@ -39,6 +39,7 @@ public class UserServiceImpl implements UsersService {
 	 * be utilized by different components, promoting code * reusability and
 	 * separation of concerns.
 	 */
+
 	@Autowired
 	private UtilService utilService;
 
@@ -55,32 +56,37 @@ public class UserServiceImpl implements UsersService {
 
 	@Override
 	@Transactional
-	public UsersDTO createUser(Users users) {
-		if (!PhoneNumberValidation.isValid(users.getPhoneNumber())) {
+	public UsersDTO createUser(Users request) {
+
+		if (!PhoneNumberValidation.isValid(request.getPhoneNumber())) {
 			throw new IllegalArgumentException("Invalid phone number format.");
 		}
-		if (!EmailValidator.isValid(users.getEmail())) {
+		if (!EmailValidator.isValid(request.getEmail())) {
 			throw new IllegalArgumentException("Invalid email, Please check your email.");
 		}
-		Optional<Users> existingUser = userRepository.findByuserNameAndIsActive(users.getUserName(), true);
+		Optional<Users> existingUser = userRepository.findByuserNameAndIsActive(request.getUserName(), true);
 		if (existingUser.isPresent()) {
 			throw new IllegalStateException("A user with this userName already exists and is active.");
 		}
 
-		Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(users.getPhoneNumber(), true);
+		Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(request.getPhoneNumber(), true);
 		if (existingPhone.isPresent()) {
 			throw new IllegalStateException("Phone number is already exist.");
 		}
 
-		if (users.getRole().equals(Role.TRAINEE) || users.getRole().equals(Role.ATTENDEE)) {
-			utilService.getMailService().sendEmail(users.getEmail(), users.getName(), users.getEmail(),
-					users.getPhoneNumber(), users.getUserName(), users.getPassword(), users.getRole());
-			users.setIsActive(true);
-			users.setPassword(utilService.getPasswordEncoder().encode(users.getPassword()));
+		if (request.getRole().equals(Role.TRAINEE) || request.getRole().equals(Role.ATTENDEE)) {
 
-			Users savedUsers = userRepository.save(users);
+			String subject = "Registration Sucessfull";
+			String htmlfile = "registrationEmail";
+			utilService.getMailService().sendEmail(request.getEmail(), subject, request.getName(), request.getEmail(),
+					request.getPhoneNumber(), request.getUserName(), request.getPassword(), request.getRole(),
+					htmlfile);
+			request.setIsActive(true);
+			request.setPassword(utilService.getPasswordEncoder().encode(request.getPassword()));
+
+			Users savedUsers = userRepository.save(request);
 			UsersDTO usersDTO = convertToDTO(savedUsers);
-			usersDTO.setMessage("User Sucessfully Register as " + "" + users.getRole() + ""
+			usersDTO.setMessage("User Sucessfully Register as " + "" + request.getRole() + ""
 					+ " please check your mail for login credentials");
 			return usersDTO;
 		} else {
@@ -90,10 +96,9 @@ public class UserServiceImpl implements UsersService {
 	}
 
 	@Override
-	public AuthenticationResponse authenticate(Users request) {
+	public AuthenticationResponse authenticate(String userName, String password) {
 		try {
-			UsernamePasswordAuthenticationToken tokenn = new UsernamePasswordAuthenticationToken(request.getUserName(),
-					request.getPassword());
+			UsernamePasswordAuthenticationToken tokenn = new UsernamePasswordAuthenticationToken(userName, password);
 			// Before authentication
 			System.out.println("Token before authentication: " + tokenn);
 
@@ -118,44 +123,43 @@ public class UserServiceImpl implements UsersService {
 	@Transactional
 	public Users updateUser(String uuid, Users request) {
 
-	    Users user = userRepository.findByUuid(uuid)
-	            .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
+		Users user = userRepository.findByUuid(uuid)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + uuid));
 
-	    if (!PhoneNumberValidation.isValid(request.getPhoneNumber())) {
-	        throw new IllegalArgumentException("Invalid phone number format");
-	    }
+		if (!PhoneNumberValidation.isValid(request.getPhoneNumber())) {
+			throw new IllegalArgumentException("Invalid phone number format");
+		}
 
-	    if (!request.getEmail().contains("@gmail.com") || !request.getEmail().endsWith(".com")) {
-	        throw new IllegalArgumentException("Invalid email, Please check your email.");
-	    }
+		if (!EmailValidator.isValid(request.getEmail())) {
+			throw new IllegalArgumentException("Invalid email, Please check your email.");
+		}
 
-	    Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(request.getPhoneNumber(), true);
-	    if (existingPhone.isPresent() && !existingPhone.get().getUuid().equals(uuid)) {
-	        throw new IllegalArgumentException("Phone number is already in use by another account.");
-	    }
+		Optional<Users> existingPhone = userRepository.findByPhoneNumberAndIsActive(request.getPhoneNumber(), true);
+		if (existingPhone.isPresent() && !existingPhone.get().getUuid().equals(uuid)) {
+			throw new IllegalArgumentException("Phone number is already in use by another account.");
+		}
 
-	    Optional<Users> existingUserName = userRepository.findByUserName(request.getUserName());
-	    if (existingUserName.isPresent() && !existingUserName.get().getUuid().equals(uuid)) {
-	        throw new IllegalArgumentException("A user with this userName already exists.");
-	    }
+		Optional<Users> existingUserName = userRepository.findByUserName(request.getUserName());
+		if (existingUserName.isPresent() && !existingUserName.get().getUuid().equals(uuid)) {
+			throw new IllegalArgumentException("A user with this userName already exists.");
+		}
+		// Allow ADMIN to be changed to TRAINEE or ATTENDEE
+		if (!user.getRole().equals(Role.ADMIN) && request.getRole().equals(Role.ADMIN)) {
+			throw new IllegalStateException("Invalid Role");
+		}
+		// Common fields update
+		user.setName(request.getName());
+		user.setEmail(request.getEmail());
+		user.setPhoneNumber(request.getPhoneNumber());
+		user.setUserName(request.getUserName());
+		user.setRole(request.getRole());
+		user.setIsActive(true);
 
-	    // Common fields update
-	    user.setName(request.getName());
-	    user.setEmail(request.getEmail());
-	    user.setPhoneNumber(request.getPhoneNumber());
-	    user.setUserName(request.getUserName());
-	    user.setPassword(utilService.getPasswordEncoder().encode(request.getPassword()));
-
-	    // Handle Role change
-	    // Allow ADMIN to be changed to TRAINEE or ATTENDEE
-	    if (!user.getRole().equals(Role.ADMIN) && request.getRole().equals(Role.ADMIN)) {
-	        throw new IllegalStateException("Invalid Role");
-	    }
-	    // Update role
-	    user.setRole(request.getRole());
-	    user.setIsActive(true);
-
-	    return userRepository.save(user);
+		String subject = "Updated Sucessfully";
+		String htmlfile = "updatedEmail";
+		utilService.getMailService().sendEmail(request.getEmail(), subject, request.getName(), request.getEmail(),
+				request.getPhoneNumber(), request.getUserName(), request.getPassword(), request.getRole(), htmlfile);
+		return userRepository.save(user);
 	}
 
 	@Override
@@ -222,4 +226,5 @@ public class UserServiceImpl implements UsersService {
 		return userRepository.findByNameContainingAndIsActive(name, true).stream().map(this::convertToDTO)
 				.collect(Collectors.toList());
 	}
+
 }

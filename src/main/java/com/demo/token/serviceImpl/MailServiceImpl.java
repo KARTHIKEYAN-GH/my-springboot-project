@@ -24,22 +24,22 @@ public class MailServiceImpl implements MailService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 	/**
-	 * TemplateEngine is used for processing email templates. 
-	 * It enables the application to generate dynamic email content 
-	 * by merging templates with data before sending emails.
+	 * TemplateEngine is used for processing email templates. It enables the
+	 * application to generate dynamic email content by merging templates with data
+	 * before sending emails.
 	 */
 	@Autowired
 	private TemplateEngine templateEngine;
 
 	@Override
-	public void sendEmail(String to, String name, String email, String phoneNumber, String userName, String password,
-			Role role) {
+	public void sendEmail(String to, String subject, String name, String email, String phoneNumber, String userName,
+			String password, Role role, String htmlfile) {
 		try {
 			MimeMessage message = javaMailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
 			// helper.setFrom(from);
 			helper.setTo(to);
-			helper.setSubject("Registration Successful");
+			helper.setSubject(subject);
 
 			// Create the email body with user details and a custom message
 			Context context = new Context();
@@ -51,7 +51,7 @@ public class MailServiceImpl implements MailService {
 			context.setVariable("role", role);
 
 			// Process the HTML template with Thymeleaf
-			String htmlContent = templateEngine.process("registrationEmail", context);
+			String htmlContent = templateEngine.process(htmlfile, context);
 
 			// Set the HTML content in the email body
 			helper.setText(htmlContent, true); // true to indicate that it is HTML
@@ -65,5 +65,4 @@ public class MailServiceImpl implements MailService {
 			throw new RuntimeException("Error while sending email: " + e.getMessage());
 		}
 	}
-
 }

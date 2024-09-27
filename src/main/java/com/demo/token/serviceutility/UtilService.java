@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.demo.token.service.CategoryService;
 import com.demo.token.service.MailService;
 import com.demo.token.service.TopicsReadStatusService;
+import com.demo.token.service.UsersService;
 import com.demo.token.serviceImpl.JwtService;
 
 import lombok.AllArgsConstructor;
@@ -58,5 +59,5 @@ public class UtilService {
 	 * for managing categories that topics belong to..
 	 */
 	private final CategoryService categoryService;
-
+	
 }

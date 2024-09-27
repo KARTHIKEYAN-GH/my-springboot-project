@@ -5,7 +5,8 @@ import com.demo.token.model.Users.Role;
 public interface MailService {
 
 	/**
-	 * To send email to registered user 
+	 * To send email to registered user
+	 * 
 	 * @param email
 	 * @param name
 	 * @param email2
@@ -14,7 +15,7 @@ public interface MailService {
 	 * @param password
 	 * @param role
 	 */
-	void sendEmail(String email, String name, String email2, String phoneNumber, String userName, String password,
-			Role role);
+	void sendEmail(String email, String subject, String name, String email2, String phoneNumber, String userName,
+			String password, Role role, String htmlfile);
 
 }
