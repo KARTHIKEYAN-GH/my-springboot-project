@@ -118,7 +118,7 @@ public class CategoryController {
 		try {
 			boolean deletedCategory = categoryService.deleteCategoryByUuid(categoryUuid);
 			if (deletedCategory) {
-				return ResponseEntity.ok(deletedCategory + "Category deleted successfully");
+				return ResponseEntity.ok( "Category deleted successfully");
 			} else {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found with uuid");
 			}

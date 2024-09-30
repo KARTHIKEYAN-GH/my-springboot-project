@@ -55,9 +55,6 @@ public interface TopicsService {
 	 */
 	CategoryWithTopicsDto getTopicsWithCategory(String categoryUuid);
 
-
-
-	//Optional<String> deactiveTopics(String Uuid);
 	
 	/**
 	 * Deletes a topic based on its unique identifier (UUID).

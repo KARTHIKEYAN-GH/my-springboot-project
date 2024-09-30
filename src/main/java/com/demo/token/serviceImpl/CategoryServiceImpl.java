@@ -72,16 +72,13 @@ public class CategoryServiceImpl implements CategoryService {
 	public boolean deleteCategoryByUuid(String uuid) {
 
 		if (categoryRepository.existsByUuid(uuid)) {
-			// categoryRepository.deleteByUuid(uuid);
 			Category deletedCategoryId = categoryRepository.findByUuid(uuid)
 					.orElseThrow(() -> new RuntimeException("category not found"));
 			if (deletedCategoryId.isActive())
 				deletedCategoryId.setActive(false);
 			categoryRepository.save(deletedCategoryId);
 			return true;
-		}
-
-		else {
+		} else {
 			return false;
 		}
 	}

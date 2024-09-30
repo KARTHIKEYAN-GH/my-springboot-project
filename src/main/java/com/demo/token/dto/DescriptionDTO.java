@@ -1,53 +1,28 @@
 package com.demo.token.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * Data Transfer Object (DTO) for descriptions.
  * <p>
- * This class is used to transfer description information, typically used
- * for various purposes where a description needs to be encapsulated in a DTO.
+ * This class is used to transfer description information, typically used for
+ * various purposes where a description needs to be encapsulated in a DTO.
  */
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class DescriptionDTO {
+	/**
+	 * Name of the topic
+	 */
+	private String topic_Name;
 
-    /**
-     * The description text.
-     */
-    private String description;
+	/**
+	 * Description of the topic
+	 */
+	private String description;
 
-    /**
-     * Default constructor.
-     * <p>
-     * Initializes a new instance of DescriptionDTO with default values.
-     */
-    public DescriptionDTO() {
-        super();
-    }
-
-    /**
-     * Parameterized constructor for creating a DescriptionDTO object with a description.
-     *
-     * @param description the description text to set
-     */
-    public DescriptionDTO(String description) {
-        super();
-        this.description = description;
-    }
-
-    /**
-     * Gets the description text.
-     *
-     * @return the description text
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Sets the description text.
-     *
-     * @param description the description text to set
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

@@ -53,7 +53,6 @@ public class TopicsServiceImpl implements TopicsService {
 	@Autowired
 	private TopicsRepository topicsRepository;
 
-	@Override
 	public TopicsDTO convertsToDTO(Topics topics) {
 		// return new TopicsDTO(topics.getUuid(), topics.getName(),
 		// topics.getCreatedBy());
@@ -63,8 +62,12 @@ public class TopicsServiceImpl implements TopicsService {
 		return utilService.getModelMapper().map(topics, TopicsDTO.class);
 	}
 
-	public List<Topics> getTopicsbycategoryUuid(String Uuid) {
-		return topicsRepository.findByCategoryUuid(Uuid);
+	public DescriptionDTO convertsDescriptionToDTO(Topics topics) {
+		utilService.getModelMapper().typeMap(Topics.class, DescriptionDTO.class).addMappings(mapper -> {
+			mapper.map(Topics::getName, DescriptionDTO::setTopic_Name);
+			mapper.map(Topics::getDescription, DescriptionDTO::setDescription); 
+		});
+		return utilService.getModelMapper().map(topics, DescriptionDTO.class);
 	}
 
 	public TopicsDTO addTopics(String categoryUuid, String name, String description) {
@@ -95,7 +98,7 @@ public class TopicsServiceImpl implements TopicsService {
 
 	@Override
 	public CategoryWithTopicsDto getTopicsWithCategory(String categoryUuid) {
-		List<TopicCategoryProjection> results = topicsRepository.findTopicAndCategoryNameByCategoryUuid(categoryUuid);
+		List<TopicCategoryProjection> results = topicsRepository.findByCategoryUuid(categoryUuid);
 
 		if (results.isEmpty()) {
 			throw new ResourceNotFoundException("Topic not found with this category UUID " + categoryUuid);
@@ -119,8 +122,6 @@ public class TopicsServiceImpl implements TopicsService {
 			//existingTopicname.setCategory(request.getCategory());
 			existingTopicname.setName(request.getName());
 			existingTopicname.setDescription(request.getDescription());
-
-			// Save the updated topic
 			topicsRepository.save(existingTopicname);
 			return Optional.of(existingTopicname.getName());
 		} else {
@@ -128,18 +129,10 @@ public class TopicsServiceImpl implements TopicsService {
 		}
 	}
 
-	public DescriptionDTO convertsDescriptionToDTO(String description) {
-		return new DescriptionDTO(description);
-	}
-
 	@Override
-	public Optional<DescriptionDTO> findAndMarkDescriptionAsReadByTopicsUuid(String topicsUuid, String token) {
-		// Fetch the description for the given topics UUID and convert it to a
-		// DescriptionDTO
-		Optional<DescriptionDTO> description = topicsRepository.findDescriptionByTopicsUuid(topicsUuid).stream()
-				.map(this::convertsDescriptionToDTO) // Convert each description to DescriptionDTO
-				.findFirst(); // Get the first description, if present
-
+	public Optional<DescriptionDTO> findAndMarkDescriptionAsReadByTopicsUuid(String uuid, String token) {
+		Optional<Topics> description = topicsRepository.findDescriptionByUuid(uuid);
+		
 		if (description.isPresent()) {
 			// Extract the username from the JWT token
 			String username = utilService.getJwtService().extractUserName(token);
@@ -149,14 +142,14 @@ public class TopicsServiceImpl implements TopicsService {
 					.orElseThrow(() -> new UsernameNotFoundException("Username not found"));
 
 			// Find the topic by UUID, throw an exception if not found
-			Topics topic = topicsRepository.findByUuid(topicsUuid)
+			Topics topic = topicsRepository.findByUuid(uuid)
 					.orElseThrow(() -> new TopicNotFoundException("Topic not found"));
 
 			// Check if the role of the user is ATTENDEE
 			if (users.getRole().equals(Role.ATTENDEE)) {
 				// Check if there's an existing read status for this user and topic
 				Optional<TopicsReadStatus> existingReadStatus = utilService.getTopicsReadStatusService()
-						.getReadStatusByTopicsUuidAndUserUuid(topicsUuid, users.getUuid());
+						.getReadStatusByTopicsUuidAndUserUuid(uuid, users.getUuid());
 
 				if (existingReadStatus.isPresent()) {
 					// Update the existing read status with the new read time
@@ -166,19 +159,19 @@ public class TopicsServiceImpl implements TopicsService {
 				} else {
 					// Create a new read status
 					TopicsReadStatus readStatus = new TopicsReadStatus();
-					readStatus.setTopicsUuid(topicsUuid); // Set the topic UUID
-					readStatus.setTopics(topic); // Set the topic entity
-					readStatus.setUsersUuid(users.getUuid()); // Set the user UUID
-					readStatus.setUserName(users.getUserName()); // Set the username
-					readStatus.setRole(users.getRole()); // Set the user role
-					readStatus.setReadAt(LocalDateTime.now()); // Set the current timestamp
+					readStatus.setTopicsUuid(uuid); 						// Set the topic UUID
+					readStatus.setTopics(topic); 							// Set the topic entity
+					readStatus.setUsersUuid(users.getUuid()); 				// Set the user UUID
+					readStatus.setUserName(users.getUserName()); 			// Set the username
+					readStatus.setRole(users.getRole()); 					// Set the user role
+					readStatus.setReadAt(LocalDateTime.now()); 				// Set the current timestamp
 					readStatus.setUsers(users);
 					readStatus.setVersion(readStatus.getVersion() + 1);
 					utilService.getTopicsReadStatusService().saveStatus(readStatus); // Save the new read status
 				}
 			}
 
-			return description;
+			return Optional.of(convertsDescriptionToDTO(topic));
 		}
 		// Return an empty Optional if no description was found
 		return Optional.empty();
@@ -188,7 +181,6 @@ public class TopicsServiceImpl implements TopicsService {
 	public boolean deleteTopicsByUuid(String uuid) {
 
 		if (topicsRepository.existsByUuid(uuid)) {
-			// categoryRepository.deleteByUuid(uuid);
 			Topics deletedTopicsId = topicsRepository.findByUuid(uuid)
 					.orElseThrow(() -> new RuntimeException("Topics not found"));
 			if (deletedTopicsId.isActive())

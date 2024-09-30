@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.demo.token.dto.TopicCategoryProjection;
-import com.demo.token.model.Category;
 import com.demo.token.model.Topics;
 
 @Repository
@@ -20,30 +19,19 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	 * @param categoryUuid
 	 * @return List of TopicCategoryProjection
 	 */
+
 	@Query("SELECT t.name AS topicName, t.uuid AS topicUuid, c.name AS categoryName "
 			+ "FROM Topics t JOIN Category c ON t.category.id = c.id " + "WHERE c.uuid = :categoryUuid")
-	List<TopicCategoryProjection> findTopicAndCategoryNameByCategoryUuid(@Param("categoryUuid") String categoryUuid);
+	List<TopicCategoryProjection> findByCategoryUuid(String categoryUuid);
 
 	/**
-	 * To find a Topic
 	 * 
-	 * @param id
-	 * @param categoryId
-	 * @return Topics
+	 * @param Topics's uuid
+	 * @return Description of the topics based on uuid
 	 */
-	//Optional<Topics> findByIdAndCategoryId(Long id, Long categoryId);
 
-	@Query("SELECT t FROM Topics t WHERE t.id = :id AND t.category.uuid = :categoryUuid")
-	Optional<Topics> findByIdAndCategoryUuid(@Param("id") String topicsUuid,@Param("categoryUuid") String categoryUuid);
-
-	/**
-	 * Too find read topic's description
-	 * 
-	 * @param topicsUuid
-	 * @return Topic's Description
-	 */
-	@Query(nativeQuery = true, value = "SELECT t.description FROM topics t WHERE t.uuid = :topicsUuid")
-	Optional<String> findDescriptionByTopicsUuid(@Param("topicsUuid") String topicsUuid);
+	//@Query("SELECT t.description FROM Topics t WHERE t.uuid = :uuid")
+	Optional<Topics> findDescriptionByUuid(@Param("uuid")String uuid);
 
 	/**
 	 * To find a Topic
@@ -54,41 +42,23 @@ public interface TopicsRepository extends JpaRepository<Topics, Long> {
 	Optional<Topics> findByUuid(String uuid);
 
 	/**
-	 * To find a topics based on category
-	 * 
-	 * @param category
-	 * @return topics details
-	 */
-	Optional<Topics> findByCategory(Category category);
-	
-	
-	//Optional<Topics>findByCategoryUuid(String categoryUuid);
-
-	/**
-	 * To find a topics under category
-	 * 
-	 * @param categoryUuid
-	 * @return List of Topics
-	 */
-	List<Topics> findByCategoryUuid(String categoryUuid);
-	
-	/**
 	 * Checks if a record exists with the given UUID.
 	 *
 	 * @param uuid The UUID of the record to check for existence.
-	 * @return {@code true} if a record with the specified UUID exists, {@code false} otherwise.
+	 * @return {@code true} if a record with the specified UUID exists,
+	 *         {@code false} otherwise.
 	 */
 	boolean existsByUuid(String uuid);
-	
+
 	/**
-	 * To find All Topics  
-	 * @return List of Topics By  IsActive is true 
+	 * To find All Topics
+	 * 
+	 * @return List of Topics By IsActive is true
 	 */
 	List<Topics> findByIsActiveTrue();
-	
-	
-	//@Query("SELECT t FROM TopicSummaryView t")
-	//@Query(value = "SELECT * FROM topic_summary_view", nativeQuery = true)
-	//List<TopicSummaryView> getAlltopics();
 
-	}
+	// @Query("SELECT t FROM TopicSummaryView t")
+	// @Query(value = "SELECT * FROM topic_summary_view", nativeQuery = true)
+	// List<TopicSummaryView> getAlltopics();
+
+}
