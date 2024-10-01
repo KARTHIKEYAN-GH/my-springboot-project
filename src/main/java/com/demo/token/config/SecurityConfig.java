@@ -37,8 +37,7 @@ public class SecurityConfig {
 
 				.requestMatchers("/api/user/**", "/api/topic-view/**").hasAuthority("ADMIN")
 
-				.requestMatchers("/api/categories/getAllCategories", "/api/categories/getById/{Uuid}",
-						"/api/topics/getAllTopics", "/api/topics/getById/{Uuid}", "/api/topics/viewDescription/{Uuid}")
+				.requestMatchers("/api/categories/getAllCategories", "/api/categories/getById/{Uuid}","/api/topics/getallTopics","/api/topics/getallTopicsBy/{categoryUuid}", "/api/topics/viewDescription/{Uuid}")
 				.hasAnyAuthority("ADMIN", "TRAINEE", "ATTENDEE")
 
 				.requestMatchers("/api/categories/**", "/api/topic-view/**").hasAnyAuthority("ADMIN", "TRAINEE")

@@ -20,7 +20,12 @@ public class JwtService {
 	public String extractUserName(String token) {
 		return extractClaim(token, Claims::getSubject);
 	}
-
+	 // Method to extract roles from the token
+    public String extractRoles(String token) {
+        Claims claims = extractAllClaims(token);
+        // Assuming roles are stored in a claim named "roles"
+        return claims.get("roles", String.class); // Or you can specify the exact type if needed
+    }
 	public boolean isValid(String token, UserDetails users) {
 		String username = extractUserName(token);
 		return (username.equals(users.getUsername())) && !isTokenExpired(token);

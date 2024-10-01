@@ -136,7 +136,6 @@ public class TopicsServiceImpl implements TopicsService {
 		if (description.isPresent()) {
 			// Extract the username from the JWT token
 			String username = utilService.getJwtService().extractUserName(token);
-
 			// Find the user by username, throw an exception if not found
 			Users users = usersService.findByUserName(username)
 					.orElseThrow(() -> new UsernameNotFoundException("Username not found"));
