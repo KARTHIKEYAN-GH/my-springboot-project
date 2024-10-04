@@ -29,6 +29,7 @@ public class ValidPath {
 		validPath.add("/api/user/getAllAttendees");
 		validPath.add("/api/user/getUserBy/{Uuid}");
 		validPath.add("/api/user/search/{name}");
+		validPath.add("/send");
 
 		// Add category-related paths
 		validPath.add("/api/categories/addCategories");
